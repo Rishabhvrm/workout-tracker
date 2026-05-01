@@ -93,20 +93,21 @@ export default function ExerciseCard({ exercise, notes }: Props) {
         {expanded && (
           <div className="px-4 pb-4">
             {/* Column headers */}
-            <div className="grid grid-cols-4 gap-2 mb-2 px-1">
+            <div className="grid gap-2 mb-2 px-1" style={{ gridTemplateColumns: '1.5rem 2.5rem 1fr 1fr 1.5rem' }}>
               <span className="text-xs text-gray-600">Set</span>
-              <span className="text-xs text-gray-600">Target</span>
+              <span className="text-xs text-gray-600">Rep</span>
               <span className="text-xs text-gray-600 text-center">Reps</span>
               <span className="text-xs text-gray-600 text-center">{unit}</span>
+              <span />
             </div>
 
             {exercise.sets.map((set, i) => (
-              <div key={i} className="grid grid-cols-4 gap-2 items-center mb-2">
+              <div key={i} className="grid gap-2 items-center mb-2" style={{ gridTemplateColumns: '1.5rem 2.5rem 1fr 1fr 1.5rem' }}>
                 {/* Set number */}
-                <span className="text-sm text-gray-400 font-medium pl-1">{set.setNumber}</span>
+                <span className="text-sm text-gray-400 font-medium">{set.setNumber}</span>
 
                 {/* Target reps */}
-                <span className="text-sm text-gray-500">{set.targetReps}</span>
+                <span className="text-xs text-gray-500">{set.targetReps}</span>
 
                 {/* Actual reps — tap to pick */}
                 <button
@@ -133,6 +134,20 @@ export default function ExerciseCard({ exercise, notes }: Props) {
                 >
                   {set.weight !== null ? (set.weight === 0 ? 'BW' : set.weight) : '—'}
                 </button>
+
+                {/* Remove set — only show when more than 1 set */}
+                {exercise.sets.length > 1 ? (
+                  <button
+                    onClick={() => dispatch({ type: 'REMOVE_SET', exerciseId: exercise.exerciseId, setIndex: i })}
+                    className="w-6 h-6 flex items-center justify-center text-gray-600 hover:text-red-400 transition-colors"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} className="w-3.5 h-3.5">
+                      <line x1="5" y1="12" x2="19" y2="12" strokeLinecap="round" />
+                    </svg>
+                  </button>
+                ) : (
+                  <span />
+                )}
               </div>
             ))}
 

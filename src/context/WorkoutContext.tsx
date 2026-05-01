@@ -10,6 +10,7 @@ type Action =
   | { type: 'UPDATE_WEIGHT'; exerciseId: string; setIndex: number; weight: number | null }
   | { type: 'UPDATE_REPS'; exerciseId: string; setIndex: number; reps: number | null }
   | { type: 'ADD_SET'; exerciseId: string }
+  | { type: 'REMOVE_SET'; exerciseId: string; setIndex: number }
   | { type: 'COMPLETE_WORKOUT' }
   | { type: 'RESET_TODAY' }
   | { type: 'SET_WEIGHT_UNIT'; unit: 'lbs' | 'kg' }
@@ -150,6 +151,22 @@ function reducer(state: AppStorage, action: Action): AppStorage {
             weight: lastSet?.weight ?? null,
           }],
         };
+      });
+      const next = updateSession(state, today, { exercises });
+      writeStorage(next);
+      return next;
+    }
+
+    case 'REMOVE_SET': {
+      const session = profile.sessions[today];
+      if (!session) return state;
+      const exercises = session.exercises.map(ex => {
+        if (ex.exerciseId !== action.exerciseId) return ex;
+        if (ex.sets.length <= 1) return ex; // never remove the last set
+        const sets = ex.sets
+          .filter((_, i) => i !== action.setIndex)
+          .map((s, i) => ({ ...s, setNumber: i + 1 }));
+        return { ...ex, sets };
       });
       const next = updateSession(state, today, { exercises });
       writeStorage(next);
