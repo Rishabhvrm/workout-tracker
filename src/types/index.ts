@@ -41,6 +41,7 @@ export interface UserProfile {
   settings: UserSettings;
   cycleState: CycleState;
   sessions: Record<string, WorkoutSession>;
+  customPlan?: WorkoutPlan;
 }
 
 export interface AppStorage {
@@ -55,11 +56,14 @@ export interface Exercise {
   sets: number;
   reps: string;
   notes?: string;
+  defaultWeightLbs?: number;
+  defaultWeightKg?: number;
 }
 
 export interface WorkoutDay {
   id: string;
   label: string;
+  goal?: string;
   exercises: Exercise[];
 }
 
@@ -67,4 +71,7 @@ export interface WorkoutPlan {
   id: string;
   name: string;
   days: WorkoutDay[];
+  // Map day-of-week (0=Sun…6=Sat) to day index in `days`. Omit for rotating cycle.
+  weeklySchedule?: Partial<Record<number, number>>;
+  restDays?: number[]; // day-of-week indices that are rest days
 }
