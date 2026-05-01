@@ -16,12 +16,7 @@ export default function ExerciseList({ exercises }: Props) {
   return (
     <div className="space-y-3">
       {exercises.map(ex => (
-        <div key={ex.exerciseId}>
-          <ExerciseCard exercise={ex} />
-          {notesMap[ex.exerciseId] && (
-            <p className="text-xs text-gray-600 mt-1 px-5">{notesMap[ex.exerciseId]}</p>
-          )}
-        </div>
+        <ExerciseCard key={ex.exerciseId} exercise={ex} notes={notesMap[ex.exerciseId]} />
       ))}
     </div>
   );

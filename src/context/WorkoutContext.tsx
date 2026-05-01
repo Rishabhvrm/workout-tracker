@@ -5,7 +5,7 @@ import { workoutPlans } from '../data/workoutPlans';
 import { getTodayISO, getTodayDayOfWeek, getDayIndex } from '../utils/dateUtils';
 
 type Action =
-  | { type: 'START_SESSION' }
+  | { type: 'START_SESSION'; dayIndexOverride?: number }
   | { type: 'TOGGLE_EXERCISE'; exerciseId: string }
   | { type: 'UPDATE_WEIGHT'; exerciseId: string; setIndex: number; weight: number | null }
   | { type: 'UPDATE_REPS'; exerciseId: string; setIndex: number; reps: number | null }
@@ -53,8 +53,9 @@ function reducer(state: AppStorage, action: Action): AppStorage {
     case 'START_SESSION': {
       if (profile.sessions[today]) return state;
       const plan = getEffectivePlan(profile);
-      const dayIndex = getTodayDayIndexFromPlan(plan, profile.settings.cycleAnchorDate);
-      if (dayIndex === -1) return state; // rest day
+      const scheduled = getTodayDayIndexFromPlan(plan, profile.settings.cycleAnchorDate);
+      const dayIndex = action.dayIndexOverride ?? (scheduled === -1 ? 0 : scheduled);
+      if (dayIndex === -1) return state;
       const day = plan.days[dayIndex];
       const isKg = profile.settings.weightUnit === 'kg';
       const session: WorkoutSession = {
