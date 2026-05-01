@@ -16,6 +16,11 @@ export function getDayIndex(cycleAnchorDate: string, totalDays: number): number 
   return idx;
 }
 
+// Returns 0=Sun, 1=Mon…6=Sat
+export function getTodayDayOfWeek(): number {
+  return new Date().getDay();
+}
+
 export function formatDuration(startedAt: string, completedAt: string | null): string {
   const end = completedAt ? new Date(completedAt) : new Date();
   const start = new Date(startedAt);

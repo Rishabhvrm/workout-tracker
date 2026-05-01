@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useReducer, useCallback } from 'react';
-import type { AppStorage, WorkoutSession, SessionExercise } from '../types';
+import type { AppStorage, WorkoutSession, SessionExercise, WorkoutPlan } from '../types';
 import { readStorage, writeStorage } from '../services/storage';
 import { workoutPlans } from '../data/workoutPlans';
-import { getTodayISO, getDayIndex } from '../utils/dateUtils';
+import { getTodayISO, getTodayDayOfWeek, getDayIndex } from '../utils/dateUtils';
 
 type Action =
   | { type: 'START_SESSION' }
@@ -15,10 +15,31 @@ type Action =
   | { type: 'SET_WEIGHT_UNIT'; unit: 'lbs' | 'kg' }
   | { type: 'SET_REST_TIMER'; seconds: number }
   | { type: 'RESET_CYCLE' }
+  | { type: 'IMPORT_PLAN'; plan: WorkoutPlan }
+  | { type: 'UPDATE_EXERCISE'; dayId: string; exerciseId: string; patch: Partial<import('../types').Exercise> }
+  | { type: 'ADD_EXERCISE'; dayId: string; exercise: import('../types').Exercise }
+  | { type: 'REMOVE_EXERCISE'; dayId: string; exerciseId: string }
   | { type: 'RELOAD' };
 
 function getActiveProfile(state: AppStorage) {
   return state.profiles[state.activeProfileId];
+}
+
+// Returns the effective plan: custom override > built-in
+export function getEffectivePlan(profile: ReturnType<typeof getActiveProfile>): WorkoutPlan {
+  if (profile.customPlan) return profile.customPlan;
+  return workoutPlans[profile.settings.defaultPlanId] ?? workoutPlans['lean-bulk-5day'];
+}
+
+// Determine today's workout day index (-1 = rest day)
+export function getTodayDayIndexFromPlan(plan: WorkoutPlan, cycleAnchorDate: string): number {
+  if (plan.weeklySchedule) {
+    const dow = getTodayDayOfWeek();
+    if (plan.restDays?.includes(dow)) return -1;
+    const idx = plan.weeklySchedule[dow];
+    return idx !== undefined ? idx : -1;
+  }
+  return getDayIndex(cycleAnchorDate, plan.days.length);
 }
 
 function reducer(state: AppStorage, action: Action): AppStorage {
@@ -31,9 +52,11 @@ function reducer(state: AppStorage, action: Action): AppStorage {
 
     case 'START_SESSION': {
       if (profile.sessions[today]) return state;
-      const plan = workoutPlans[profile.settings.defaultPlanId];
-      const dayIndex = getDayIndex(profile.settings.cycleAnchorDate, plan.days.length);
+      const plan = getEffectivePlan(profile);
+      const dayIndex = getTodayDayIndexFromPlan(plan, profile.settings.cycleAnchorDate);
+      if (dayIndex === -1) return state; // rest day
       const day = plan.days[dayIndex];
+      const isKg = profile.settings.weightUnit === 'kg';
       const session: WorkoutSession = {
         date: today,
         planId: plan.id,
@@ -48,7 +71,10 @@ function reducer(state: AppStorage, action: Action): AppStorage {
             setNumber: i + 1,
             targetReps: ex.reps,
             actualReps: null,
-            weight: null,
+            // Pre-populate with default weight
+            weight: isKg
+              ? (ex.defaultWeightKg ?? null)
+              : (ex.defaultWeightLbs ?? null),
           })),
         })),
       };
@@ -114,13 +140,15 @@ function reducer(state: AppStorage, action: Action): AppStorage {
       const exercises = session.exercises.map(ex => {
         if (ex.exerciseId !== action.exerciseId) return ex;
         const lastSet = ex.sets[ex.sets.length - 1];
-        const newSet = {
-          setNumber: ex.sets.length + 1,
-          targetReps: lastSet?.targetReps ?? '10',
-          actualReps: null,
-          weight: lastSet?.weight ?? null,
+        return {
+          ...ex,
+          sets: [...ex.sets, {
+            setNumber: ex.sets.length + 1,
+            targetReps: lastSet?.targetReps ?? '10',
+            actualReps: null,
+            weight: lastSet?.weight ?? null,
+          }],
         };
-        return { ...ex, sets: [...ex.sets, newSet] };
       });
       const next = updateSession(state, today, { exercises });
       writeStorage(next);
@@ -140,10 +168,7 @@ function reducer(state: AppStorage, action: Action): AppStorage {
       delete sessions[today];
       const next: AppStorage = {
         ...state,
-        profiles: {
-          ...state.profiles,
-          [state.activeProfileId]: { ...profile, sessions },
-        },
+        profiles: { ...state.profiles, [state.activeProfileId]: { ...profile, sessions } },
       };
       writeStorage(next);
       return next;
@@ -194,16 +219,83 @@ function reducer(state: AppStorage, action: Action): AppStorage {
       return next;
     }
 
+    case 'IMPORT_PLAN': {
+      const next: AppStorage = {
+        ...state,
+        profiles: {
+          ...state.profiles,
+          [state.activeProfileId]: { ...profile, customPlan: action.plan },
+        },
+      };
+      writeStorage(next);
+      return next;
+    }
+
+    case 'UPDATE_EXERCISE': {
+      const plan = getEffectivePlan(profile);
+      const updatedDays = plan.days.map(day => {
+        if (day.id !== action.dayId) return day;
+        return {
+          ...day,
+          exercises: day.exercises.map(ex =>
+            ex.id === action.exerciseId ? { ...ex, ...action.patch } : ex
+          ),
+        };
+      });
+      const updatedPlan = { ...plan, days: updatedDays };
+      const next: AppStorage = {
+        ...state,
+        profiles: {
+          ...state.profiles,
+          [state.activeProfileId]: { ...profile, customPlan: updatedPlan },
+        },
+      };
+      writeStorage(next);
+      return next;
+    }
+
+    case 'ADD_EXERCISE': {
+      const plan = getEffectivePlan(profile);
+      const updatedDays = plan.days.map(day => {
+        if (day.id !== action.dayId) return day;
+        return { ...day, exercises: [...day.exercises, action.exercise] };
+      });
+      const updatedPlan = { ...plan, days: updatedDays };
+      const next: AppStorage = {
+        ...state,
+        profiles: {
+          ...state.profiles,
+          [state.activeProfileId]: { ...profile, customPlan: updatedPlan },
+        },
+      };
+      writeStorage(next);
+      return next;
+    }
+
+    case 'REMOVE_EXERCISE': {
+      const plan = getEffectivePlan(profile);
+      const updatedDays = plan.days.map(day => {
+        if (day.id !== action.dayId) return day;
+        return { ...day, exercises: day.exercises.filter(ex => ex.id !== action.exerciseId) };
+      });
+      const updatedPlan = { ...plan, days: updatedDays };
+      const next: AppStorage = {
+        ...state,
+        profiles: {
+          ...state.profiles,
+          [state.activeProfileId]: { ...profile, customPlan: updatedPlan },
+        },
+      };
+      writeStorage(next);
+      return next;
+    }
+
     default:
       return state;
   }
 }
 
-function updateSession(
-  state: AppStorage,
-  date: string,
-  patch: Partial<WorkoutSession>
-): AppStorage {
+function updateSession(state: AppStorage, date: string, patch: Partial<WorkoutSession>): AppStorage {
   const profile = getActiveProfile(state);
   const session = profile.sessions[date];
   return {
@@ -212,10 +304,7 @@ function updateSession(
       ...state.profiles,
       [state.activeProfileId]: {
         ...profile,
-        sessions: {
-          ...profile.sessions,
-          [date]: { ...session, ...patch },
-        },
+        sessions: { ...profile.sessions, [date]: { ...session, ...patch } },
       },
     },
   };
@@ -227,6 +316,7 @@ interface WorkoutContextValue {
   profile: ReturnType<typeof getActiveProfile>;
   todaySession: WorkoutSession | undefined;
   todayDayLabel: string;
+  isRestDay: boolean;
 }
 
 const WorkoutContext = createContext<WorkoutContextValue | null>(null);
@@ -235,20 +325,16 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, undefined, readStorage);
   const profile = getActiveProfile(state);
   const todaySession = profile.sessions[getTodayISO()];
+  const plan = getEffectivePlan(profile);
+  const dayIndex = getTodayDayIndexFromPlan(plan, profile.settings.cycleAnchorDate);
+  const isRestDay = dayIndex === -1;
+  const todayDayLabel = isRestDay ? 'Rest Day' : (plan.days[dayIndex]?.label ?? 'Workout');
 
-  const plan = workoutPlans[profile.settings.defaultPlanId];
-  const dayIndex = getDayIndex(profile.settings.cycleAnchorDate, plan.days.length);
-  const todayDayLabel = plan.days[dayIndex]?.label ?? 'Workout';
-
-  const value: WorkoutContextValue = {
-    state,
-    dispatch,
-    profile,
-    todaySession,
-    todayDayLabel,
-  };
-
-  return <WorkoutContext.Provider value={value}>{children}</WorkoutContext.Provider>;
+  return (
+    <WorkoutContext.Provider value={{ state, dispatch, profile, todaySession, todayDayLabel, isRestDay }}>
+      {children}
+    </WorkoutContext.Provider>
+  );
 }
 
 export function useWorkout(): WorkoutContextValue {

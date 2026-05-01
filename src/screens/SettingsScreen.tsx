@@ -1,20 +1,21 @@
-import { useWorkout, useDispatch } from '../context/WorkoutContext';
+import { useState } from 'react';
+import { useWorkout, useDispatch, getEffectivePlan, getTodayDayIndexFromPlan } from '../context/WorkoutContext';
 import { exportStorageJson, importStorageJson } from '../services/storage';
-import { workoutPlans } from '../data/workoutPlans';
-import { getDayIndex, getTodayISO } from '../utils/dateUtils';
+import { getTodayISO } from '../utils/dateUtils';
+import PlanEditor from '../components/settings/PlanEditor';
 
 export default function SettingsScreen() {
   const { profile } = useWorkout();
   const dispatch = useDispatch();
+  const [showPlanEditor, setShowPlanEditor] = useState(false);
 
-  const plan = workoutPlans[profile.settings.defaultPlanId];
-  const dayIndex = getDayIndex(profile.settings.cycleAnchorDate, plan.days.length);
+  const plan = getEffectivePlan(profile);
+  const dayIndex = getTodayDayIndexFromPlan(plan, profile.settings.cycleAnchorDate);
 
   function handleImport() {
     const json = prompt('Paste your exported JSON:');
     if (!json) return;
-    const ok = importStorageJson(json);
-    if (ok) {
+    if (importStorageJson(json)) {
       dispatch({ type: 'RELOAD' });
       alert('Data imported!');
     } else {
@@ -39,14 +40,14 @@ export default function SettingsScreen() {
 
       <div className="space-y-4">
         {/* Weight unit */}
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-4">
+        <section className="bg-gray-900 rounded-2xl border border-gray-800 p-4">
           <p className="text-sm text-gray-400 mb-3">Weight unit</p>
           <div className="flex gap-3">
             {(['lbs', 'kg'] as const).map(u => (
               <button
                 key={u}
                 onClick={() => dispatch({ type: 'SET_WEIGHT_UNIT', unit: u })}
-                className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                className={`flex-1 py-3 rounded-xl text-sm font-semibold transition-all ${
                   profile.settings.weightUnit === u
                     ? 'bg-orange-500 text-white'
                     : 'bg-gray-800 text-gray-400'
@@ -56,17 +57,17 @@ export default function SettingsScreen() {
               </button>
             ))}
           </div>
-        </div>
+        </section>
 
         {/* Rest timer */}
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-4">
+        <section className="bg-gray-900 rounded-2xl border border-gray-800 p-4">
           <p className="text-sm text-gray-400 mb-3">Rest timer (seconds)</p>
-          <div className="flex gap-3">
+          <div className="grid grid-cols-4 gap-2">
             {[60, 90, 120, 180].map(s => (
               <button
                 key={s}
                 onClick={() => dispatch({ type: 'SET_REST_TIMER', seconds: s })}
-                className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                className={`py-3 rounded-xl text-sm font-semibold transition-all ${
                   profile.settings.restTimerSeconds === s
                     ? 'bg-orange-500 text-white'
                     : 'bg-gray-800 text-gray-400'
@@ -76,48 +77,59 @@ export default function SettingsScreen() {
               </button>
             ))}
           </div>
-        </div>
+        </section>
 
-        {/* Cycle info */}
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-4">
-          <p className="text-sm text-gray-400 mb-1">Workout cycle</p>
-          <p className="text-white text-sm mb-1">
-            Today: <span className="text-orange-400 font-semibold">{plan.days[dayIndex].label}</span>
-            {' '}(Day {dayIndex + 1} of {plan.days.length})
-          </p>
-          <p className="text-xs text-gray-600 mb-3">
-            Cycle started: {profile.settings.cycleAnchorDate}
-          </p>
-          <button
-            onClick={() => {
-              if (confirm('Reset cycle to start from today (Push Day 1)?')) {
-                dispatch({ type: 'RESET_CYCLE' });
-              }
-            }}
-            className="text-sm text-orange-400 hover:text-orange-300"
-          >
-            Reset cycle to today →
-          </button>
-        </div>
+        {/* Workout plan */}
+        <section className="bg-gray-900 rounded-2xl border border-gray-800 p-4">
+          <div className="flex items-center justify-between mb-1">
+            <p className="text-sm text-gray-400">Workout plan</p>
+            <button
+              onClick={() => setShowPlanEditor(e => !e)}
+              className="text-xs text-orange-400 font-medium"
+            >
+              {showPlanEditor ? 'Hide editor' : 'Edit plan'}
+            </button>
+          </div>
+          <p className="text-white text-sm font-medium">{plan.name}</p>
+          {dayIndex >= 0 ? (
+            <p className="text-xs text-gray-500 mt-1">
+              Today: <span className="text-orange-400">{plan.days[dayIndex].label}</span>
+            </p>
+          ) : (
+            <p className="text-xs text-gray-500 mt-1">Today is a rest day</p>
+          )}
+
+          {!plan.weeklySchedule && (
+            <div className="mt-3 pt-3 border-t border-gray-800">
+              <p className="text-xs text-gray-500 mb-1">Cycle anchor: {profile.settings.cycleAnchorDate}</p>
+              <button
+                onClick={() => { if (confirm('Reset cycle to start from today?')) dispatch({ type: 'RESET_CYCLE' }); }}
+                className="text-xs text-orange-400"
+              >
+                Reset cycle to today →
+              </button>
+            </div>
+          )}
+
+          {showPlanEditor && (
+            <div className="mt-4 pt-4 border-t border-gray-800">
+              <PlanEditor />
+            </div>
+          )}
+        </section>
 
         {/* Data backup */}
-        <div className="bg-gray-900 rounded-xl border border-gray-800 p-4">
+        <section className="bg-gray-900 rounded-2xl border border-gray-800 p-4">
           <p className="text-sm text-gray-400 mb-3">Data backup</p>
           <div className="flex gap-3">
-            <button
-              onClick={handleExport}
-              className="flex-1 bg-gray-800 text-gray-300 py-2.5 rounded-xl text-sm font-medium"
-            >
+            <button onClick={handleExport} className="flex-1 bg-gray-800 text-gray-300 py-3 rounded-xl text-sm font-medium">
               Export JSON
             </button>
-            <button
-              onClick={handleImport}
-              className="flex-1 bg-gray-800 text-gray-300 py-2.5 rounded-xl text-sm font-medium"
-            >
+            <button onClick={handleImport} className="flex-1 bg-gray-800 text-gray-300 py-3 rounded-xl text-sm font-medium">
               Import JSON
             </button>
           </div>
-        </div>
+        </section>
 
         <p className="text-center text-xs text-gray-700 pt-2">
           Data stored locally on this device
