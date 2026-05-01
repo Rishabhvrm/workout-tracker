@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import BottomNav from './BottomNav';
+import RestTimerOverlay from '../ui/RestTimerOverlay';
 
 export default function AppShell() {
   return (
@@ -10,6 +11,7 @@ export default function AppShell() {
       >
         <Outlet />
       </main>
+      <RestTimerOverlay />
       <BottomNav />
     </div>
   );

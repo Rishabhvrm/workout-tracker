@@ -3,6 +3,7 @@ import type { SessionExercise } from '../../types';
 import { useWorkout, useDispatch } from '../../context/WorkoutContext';
 import PickerSheet, { weightValues, repsValues } from '../ui/PickerSheet';
 import ExerciseInfoSheet from './ExerciseInfoSheet';
+import { useRestTimer } from '../../context/RestTimerContext';
 
 interface Props {
   exercise: SessionExercise;
@@ -14,6 +15,7 @@ type PickerTarget = { exerciseId: string; setIndex: number; kind: 'weight' | 're
 export default function ExerciseCard({ exercise, notes }: Props) {
   const { profile } = useWorkout();
   const dispatch = useDispatch();
+  const { start: startTimer } = useRestTimer();
   const unit = profile.settings.weightUnit;
   const [expanded, setExpanded] = useState(!exercise.completed);
   const [picker, setPicker] = useState<PickerTarget>(null);
@@ -156,12 +158,15 @@ export default function ExerciseCard({ exercise, notes }: Props) {
           values={wValues}
           value={activePicker.weight ?? 0}
           unit={unit}
-          onConfirm={v => dispatch({
-            type: 'UPDATE_WEIGHT',
-            exerciseId: picker.exerciseId,
-            setIndex: picker.setIndex,
-            weight: v as number,
-          })}
+          onConfirm={v => {
+            dispatch({
+              type: 'UPDATE_WEIGHT',
+              exerciseId: picker.exerciseId,
+              setIndex: picker.setIndex,
+              weight: v as number,
+            });
+            startTimer(profile.settings.restTimerSeconds);
+          }}
           onClose={() => setPicker(null)}
         />
       )}
