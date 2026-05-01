@@ -2,19 +2,22 @@ import { useState } from 'react';
 import type { SessionExercise } from '../../types';
 import { useWorkout, useDispatch } from '../../context/WorkoutContext';
 import PickerSheet, { weightValues, repsValues } from '../ui/PickerSheet';
+import ExerciseInfoSheet from './ExerciseInfoSheet';
 
 interface Props {
   exercise: SessionExercise;
+  notes?: string;
 }
 
 type PickerTarget = { exerciseId: string; setIndex: number; kind: 'weight' | 'reps' } | null;
 
-export default function ExerciseCard({ exercise }: Props) {
+export default function ExerciseCard({ exercise, notes }: Props) {
   const { profile } = useWorkout();
   const dispatch = useDispatch();
   const unit = profile.settings.weightUnit;
   const [expanded, setExpanded] = useState(!exercise.completed);
   const [picker, setPicker] = useState<PickerTarget>(null);
+  const [showInfo, setShowInfo] = useState(false);
 
   function toggle() {
     dispatch({ type: 'TOGGLE_EXERCISE', exerciseId: exercise.exerciseId });
@@ -64,6 +67,17 @@ export default function ExerciseCard({ exercise }: Props) {
 
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-500">{exercise.sets.length} sets</span>
+            {/* Info button */}
+            <button
+              onClick={e => { e.stopPropagation(); setShowInfo(true); }}
+              className="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center text-gray-500 hover:text-orange-400 hover:bg-gray-700 transition-colors flex-shrink-0"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-3.5 h-3.5">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="8" strokeWidth={3} strokeLinecap="round" />
+                <line x1="12" y1="12" x2="12" y2="16" strokeLinecap="round" />
+              </svg>
+            </button>
             <svg
               viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}
               className={`w-4 h-4 text-gray-600 transition-transform flex-shrink-0 ${expanded ? 'rotate-180' : ''}`}
@@ -167,6 +181,16 @@ export default function ExerciseCard({ exercise }: Props) {
             reps: v as number,
           })}
           onClose={() => setPicker(null)}
+        />
+      )}
+
+      {/* Exercise info sheet */}
+      {showInfo && (
+        <ExerciseInfoSheet
+          exerciseId={exercise.exerciseId}
+          exerciseName={exercise.name}
+          notes={notes}
+          onClose={() => setShowInfo(false)}
         />
       )}
     </>
