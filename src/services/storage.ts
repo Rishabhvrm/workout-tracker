@@ -2,7 +2,7 @@ import type { AppStorage, UserProfile } from '../types';
 import { DEFAULT_PLAN_ID } from '../data/workoutPlans';
 
 const STORAGE_KEY = 'wt_v1';
-const SCHEMA_VERSION = 1;
+const SCHEMA_VERSION = 2;
 
 function createDefaultProfile(): UserProfile {
   const today = new Date().toISOString().split('T')[0];
@@ -53,9 +53,30 @@ export function writeStorage(data: AppStorage): void {
 }
 
 function migrateStorage(data: AppStorage): AppStorage {
-  if (data.version === SCHEMA_VERSION) return data;
-  // Future migrations go here
-  return data;
+  let d = data;
+
+  // v1 → v2: upgrade defaultPlanId from 'ppl' to the new 5-day plan
+  if (d.version < 2) {
+    const profiles = Object.fromEntries(
+      Object.entries(d.profiles).map(([key, profile]) => [
+        key,
+        {
+          ...profile,
+          settings: {
+            ...profile.settings,
+            defaultPlanId:
+              profile.settings.defaultPlanId === 'ppl'
+                ? DEFAULT_PLAN_ID
+                : profile.settings.defaultPlanId,
+          },
+        },
+      ])
+    );
+    d = { ...d, version: 2, profiles };
+    writeStorage(d);
+  }
+
+  return d;
 }
 
 export function exportStorageJson(): string {
