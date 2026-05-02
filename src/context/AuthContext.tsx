@@ -42,15 +42,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   async function signUp(email: string, password: string, name: string): Promise<string | null> {
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
       options: { data: { name } },
     });
     if (error) return error.message;
-    if (data.user) {
-      await supabase.from('profiles').update({ name }).eq('id', data.user.id);
-    }
+    // Name is written by the DB trigger via raw_user_meta_data — no separate update needed.
     sessionStorage.setItem('wt_new_user', '1');
     setIsNewUser(true);
     return null;
