@@ -1,8 +1,11 @@
-import React, { createContext, useContext, useReducer, useCallback } from 'react';
-import type { AppStorage, WorkoutSession, SessionExercise, WorkoutPlan } from '../types';
-import { readStorage, writeStorage } from '../services/storage';
-import { workoutPlans } from '../data/workoutPlans';
+import React, { createContext, useContext, useReducer, useCallback, useEffect, useRef } from 'react';
+import type { AppStorage, WorkoutSession, SessionExercise, WorkoutPlan, UserProfile } from '../types';
+import { readStorage, writeStorage, setGuestMode } from '../services/storage';
+import { workoutPlans, DEFAULT_PLAN_ID } from '../data/workoutPlans';
 import { getTodayISO, getTodayDayOfWeek, getDayIndex } from '../utils/dateUtils';
+import { fetchProfile, fetchSessions, fetchCustomPlan, upsertProfile, upsertSession, upsertCustomPlan } from '../services/database';
+import type { DbProfile } from '../services/database';
+import { useAuth } from './AuthContext';
 
 type Action =
   | { type: 'START_SESSION'; dayIndexOverride?: number }
@@ -20,7 +23,9 @@ type Action =
   | { type: 'UPDATE_EXERCISE'; dayId: string; exerciseId: string; patch: Partial<import('../types').Exercise> }
   | { type: 'ADD_EXERCISE'; dayId: string; exercise: import('../types').Exercise }
   | { type: 'REMOVE_EXERCISE'; dayId: string; exerciseId: string }
-  | { type: 'RELOAD' };
+  | { type: 'RELOAD' }
+  | { type: 'SET_ACTIVE_USER'; userId: string; name: string }
+  | { type: 'MERGE_REMOTE'; sessions: Record<string, WorkoutSession>; customPlan: WorkoutPlan | null; remoteProfile: DbProfile | null };
 
 function getActiveProfile(state: AppStorage) {
   return state.profiles[state.activeProfileId];
@@ -308,6 +313,70 @@ function reducer(state: AppStorage, action: Action): AppStorage {
       return next;
     }
 
+    case 'SET_ACTIVE_USER': {
+      const { userId, name } = action;
+      const existingProfile = state.profiles[userId];
+      if (existingProfile) {
+        const next = { ...state, activeProfileId: userId };
+        writeStorage(next);
+        return next;
+      }
+      const today = getTodayISO();
+      const newProfile: UserProfile = {
+        id: userId,
+        name,
+        createdAt: today,
+        settings: {
+          defaultPlanId: DEFAULT_PLAN_ID,
+          weightUnit: 'lbs',
+          restTimerSeconds: 90,
+          cycleAnchorDate: today,
+        },
+        cycleState: { planId: DEFAULT_PLAN_ID, dayIndex: 0, lastWorkoutDate: '' },
+        sessions: {},
+      };
+      const next: AppStorage = {
+        ...state,
+        activeProfileId: userId,
+        profiles: { ...state.profiles, [userId]: newProfile },
+      };
+      writeStorage(next);
+      return next;
+    }
+
+    case 'MERGE_REMOTE': {
+      const today = getTodayISO();
+      const localProfile = getActiveProfile(state);
+      const todayLocal = localProfile.sessions[today];
+
+      const mergedSessions: Record<string, WorkoutSession> = {
+        ...action.sessions,
+        ...(todayLocal ? { [today]: todayLocal } : {}),
+      };
+
+      const mergedSettings = action.remoteProfile ? {
+        ...localProfile.settings,
+        weightUnit: action.remoteProfile.weight_unit as 'lbs' | 'kg',
+        restTimerSeconds: action.remoteProfile.rest_timer_seconds,
+        cycleAnchorDate: action.remoteProfile.cycle_anchor_date,
+      } : localProfile.settings;
+
+      const mergedProfile: UserProfile = {
+        ...localProfile,
+        name: action.remoteProfile?.name ?? localProfile.name,
+        settings: mergedSettings,
+        sessions: mergedSessions,
+        customPlan: action.customPlan ?? localProfile.customPlan,
+      };
+
+      const next: AppStorage = {
+        ...state,
+        profiles: { ...state.profiles, [state.activeProfileId]: mergedProfile },
+      };
+      writeStorage(next);
+      return next;
+    }
+
     default:
       return state;
   }
@@ -341,6 +410,54 @@ const WorkoutContext = createContext<WorkoutContextValue | null>(null);
 
 export function WorkoutProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, undefined, readStorage);
+  const { user, isGuest } = useAuth();
+  const syncTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Disable localStorage writes in guest mode
+  useEffect(() => {
+    setGuestMode(isGuest);
+  }, [isGuest]);
+
+  // Switch to the logged-in user's profile
+  useEffect(() => {
+    if (!user) return;
+    const name = (user.user_metadata?.name as string | undefined) || 'Me';
+    dispatch({ type: 'SET_ACTIVE_USER', userId: user.id, name });
+  }, [user?.id]);
+
+  // Fetch remote data and merge after login
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const [sessions, customPlan, remoteProfile] = await Promise.all([
+        fetchSessions(user.id),
+        fetchCustomPlan(user.id),
+        fetchProfile(user.id),
+      ]);
+      dispatch({ type: 'MERGE_REMOTE', sessions, customPlan, remoteProfile });
+    })();
+  }, [user?.id]);
+
+  // Sync state to Supabase on changes (debounced 1.5s)
+  useEffect(() => {
+    if (!user || isGuest) return;
+    if (syncTimer.current) clearTimeout(syncTimer.current);
+    syncTimer.current = setTimeout(() => {
+      const profile = getActiveProfile(state);
+      upsertProfile(user.id, {
+        name: profile.name,
+        weight_unit: profile.settings.weightUnit,
+        rest_timer_seconds: profile.settings.restTimerSeconds,
+        cycle_anchor_date: profile.settings.cycleAnchorDate,
+      }).catch(console.error);
+      const today = getTodayISO();
+      const session = profile.sessions[today];
+      if (session) upsertSession(user.id, session).catch(console.error);
+      if (profile.customPlan) upsertCustomPlan(user.id, profile.customPlan).catch(console.error);
+    }, 1500);
+    return () => { if (syncTimer.current) clearTimeout(syncTimer.current); };
+  }, [state, user?.id, isGuest]);
+
   const profile = getActiveProfile(state);
   const todaySession = profile.sessions[getTodayISO()];
   const plan = getEffectivePlan(profile);

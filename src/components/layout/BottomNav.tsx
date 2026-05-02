@@ -1,4 +1,6 @@
 import { NavLink } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import { useWorkout } from '../../context/WorkoutContext';
 
 const tabs = [
   {
@@ -42,23 +44,36 @@ const tabs = [
 ];
 
 export default function BottomNav() {
+  const { isGuest } = useAuth();
+  const { profile } = useWorkout();
+  const avatarLetter = profile.name.charAt(0).toUpperCase();
+
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 flex z-50"
          style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
-      {tabs.map(tab => (
-        <NavLink
-          key={tab.to}
-          to={tab.to}
-          className={({ isActive }) =>
-            `flex-1 flex flex-col items-center justify-center py-3 gap-1 text-xs transition-colors ${
-              isActive ? 'text-orange-400' : 'text-gray-500'
-            }`
-          }
-        >
-          {tab.icon}
-          {tab.label}
-        </NavLink>
-      ))}
+      {tabs.map(tab => {
+        const isSettings = tab.to === '/settings';
+        return (
+          <NavLink
+            key={tab.to}
+            to={tab.to}
+            className={({ isActive }) =>
+              `flex-1 flex flex-col items-center justify-center py-3 gap-1 text-xs transition-colors ${
+                isActive ? 'text-orange-400' : 'text-gray-500'
+              }`
+            }
+          >
+            {isSettings && !isGuest ? (
+              <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center text-white text-xs font-bold">
+                {avatarLetter}
+              </div>
+            ) : (
+              tab.icon
+            )}
+            {tab.label}
+          </NavLink>
+        );
+      })}
     </nav>
   );
 }

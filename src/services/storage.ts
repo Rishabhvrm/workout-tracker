@@ -4,6 +4,9 @@ import { DEFAULT_PLAN_ID } from '../data/workoutPlans';
 const STORAGE_KEY = 'wt_v1';
 const SCHEMA_VERSION = 2;
 
+let guestMode = false;
+export function setGuestMode(v: boolean) { guestMode = v; }
+
 function createDefaultProfile(): UserProfile {
   const today = new Date().toISOString().split('T')[0];
   return {
@@ -45,11 +48,16 @@ export function readStorage(): AppStorage {
 }
 
 export function writeStorage(data: AppStorage): void {
+  if (guestMode) return;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch {
     // localStorage quota exceeded — silently fail
   }
+}
+
+export function clearStorage(): void {
+  localStorage.removeItem(STORAGE_KEY);
 }
 
 function migrateStorage(data: AppStorage): AppStorage {

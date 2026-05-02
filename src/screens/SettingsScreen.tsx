@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useWorkout, useDispatch, getEffectivePlan, getTodayDayIndexFromPlan } from '../context/WorkoutContext';
+import { useAuth } from '../context/AuthContext';
 import { exportStorageJson, importStorageJson } from '../services/storage';
 import { getTodayISO } from '../utils/dateUtils';
 import PlanEditor from '../components/settings/PlanEditor';
@@ -7,6 +8,7 @@ import PlanEditor from '../components/settings/PlanEditor';
 export default function SettingsScreen() {
   const { profile } = useWorkout();
   const dispatch = useDispatch();
+  const { user, isGuest, signOut, showAuthScreen } = useAuth();
   const [showPlanEditor, setShowPlanEditor] = useState(false);
 
   const plan = getEffectivePlan(profile);
@@ -39,6 +41,38 @@ export default function SettingsScreen() {
       <h1 className="text-2xl font-bold text-white mb-6">Settings</h1>
 
       <div className="space-y-4">
+        {/* Account section */}
+        <section className="bg-gray-900 rounded-2xl border border-gray-800 p-4">
+          {isGuest ? (
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-semibold text-white">Guest</p>
+                <p className="text-xs text-gray-500 mt-0.5">Data not saved</p>
+              </div>
+              <button onClick={showAuthScreen} className="text-xs font-semibold text-orange-400 bg-orange-500/10 border border-orange-500/30 px-3 py-1.5 rounded-lg">
+                Sign up →
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center text-white font-bold text-base flex-shrink-0">
+                  {profile.name.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-white">{profile.name}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">{user?.email}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => { if (confirm('Sign out?')) signOut(); }}
+                className="text-xs text-gray-500 bg-gray-800 px-3 py-1.5 rounded-lg hover:text-red-400 transition-colors"
+              >
+                Sign out
+              </button>
+            </div>
+          )}
+        </section>
         {/* Weight unit */}
         <section className="bg-gray-900 rounded-2xl border border-gray-800 p-4">
           <p className="text-sm text-gray-400 mb-3">Weight unit</p>
@@ -132,7 +166,7 @@ export default function SettingsScreen() {
         </section>
 
         <p className="text-center text-xs text-gray-700 pt-2">
-          Data stored locally on this device
+          {isGuest ? 'Data not saved — sign up to persist across devices' : 'Synced to Supabase · cached locally'}
         </p>
       </div>
     </div>
