@@ -26,6 +26,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [guestChosen, setGuestChosen] = useState(false);
 
   useEffect(() => {
+    // Handle tokens arriving in the URL hash from email confirmation links.
+    // Supabase puts #access_token=...&refresh_token=... in the hash after redirect.
+    // We extract the session from it so HashRouter doesn't swallow it.
+    const hash = window.location.hash;
+    if (hash.includes('access_token=')) {
+      const params = new URLSearchParams(hash.replace(/^#\/?/, ''));
+      const access_token = params.get('access_token');
+      const refresh_token = params.get('refresh_token');
+      if (access_token && refresh_token) {
+        supabase.auth.setSession({ access_token, refresh_token }).then(({ data }) => {
+          setUser(data.session?.user ?? null);
+          setLoading(false);
+          // Clean the URL so HashRouter doesn't see it as a route
+          window.history.replaceState(null, '', window.location.pathname);
+        });
+        setIsNewUser(sessionStorage.getItem('wt_new_user') === '1');
+        return;
+      }
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       setLoading(false);
@@ -42,10 +62,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   async function signUp(email: string, password: string, name: string): Promise<string | null> {
+    const redirectTo = window.location.hostname === 'localhost'
+      ? `${window.location.origin}/workout-tracker`
+      : 'https://rishabhvrm.github.io/workout-tracker';
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { name } },
+      options: {
+        data: { name },
+        emailRedirectTo: redirectTo,
+      },
     });
     if (error) return error.message;
     // Name is written by the DB trigger via raw_user_meta_data — no separate update needed.
