@@ -46,6 +46,11 @@ export default function ExerciseCard({ exercise, notes }: Props) {
   const wValues = weightValues(unit);
   const rValues = repsValues();
 
+  function parseLowerReps(targetReps: string): number {
+    const match = targetReps.match(/\d+/);
+    return match ? parseInt(match[0], 10) : 0;
+  }
+
   const activePicker = picker
     ? exercise.sets[picker.setIndex] ?? null
     : null;
@@ -229,7 +234,7 @@ export default function ExerciseCard({ exercise, notes }: Props) {
           open
           title={`Set ${picker.setIndex + 1} — Reps`}
           values={rValues}
-          value={activePicker.actualReps ?? 0}
+          value={activePicker.actualReps ?? parseLowerReps(activePicker.targetReps)}
           unit="reps"
           onConfirm={v => dispatch({
             type: 'UPDATE_REPS',
