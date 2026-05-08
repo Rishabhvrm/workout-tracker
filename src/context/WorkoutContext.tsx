@@ -354,9 +354,12 @@ function reducer(state: AppStorage, action: Action): AppStorage {
       const localProfile = getActiveProfile(state);
       const todayLocal = localProfile.sessions[today];
 
+      const todayHasData = todayLocal?.exercises.some(e =>
+        e.sets.some(s => s.actualReps !== null || s.weight !== null)
+      );
       const mergedSessions: Record<string, WorkoutSession> = {
         ...action.sessions,
-        ...(todayLocal ? { [today]: todayLocal } : {}),
+        ...(todayHasData ? { [today]: todayLocal! } : {}),
       };
 
       const mergedSettings = action.remoteProfile ? {
@@ -454,6 +457,23 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
         }
       }
     })();
+  }, [user?.id]);
+
+  // Refetch from Supabase whenever the tab becomes visible again (covers cross-device sync)
+  useEffect(() => {
+    if (!user) return;
+    function handleVisibility() {
+      if (document.visibilityState !== 'visible') return;
+      Promise.all([
+        fetchSessions(user!.id),
+        fetchCustomPlan(user!.id),
+        fetchProfile(user!.id),
+      ]).then(([sessions, customPlan, remoteProfile]) => {
+        dispatch({ type: 'MERGE_REMOTE', sessions, customPlan, remoteProfile });
+      });
+    }
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
   }, [user?.id]);
 
   // Sync state to Supabase on changes (debounced 1.5s)
