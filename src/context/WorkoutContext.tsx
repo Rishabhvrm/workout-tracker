@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useCallback, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useReducer, useCallback, useEffect, useRef, useState } from 'react';
 import type { AppStorage, WorkoutSession, SessionExercise, WorkoutPlan, UserProfile } from '../types';
 import { readStorage, writeStorage, setGuestMode } from '../services/storage';
 import { workoutPlans, DEFAULT_PLAN_ID } from '../data/workoutPlans';
@@ -412,6 +412,7 @@ interface WorkoutContextValue {
   todaySession: WorkoutSession | undefined;
   todayDayLabel: string;
   isRestDay: boolean;
+  syncReady: boolean;
 }
 
 const WorkoutContext = createContext<WorkoutContextValue | null>(null);
@@ -420,6 +421,7 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, undefined, readStorage);
   const { user, isGuest, guestChosen } = useAuth();
   const syncTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [syncReady, setSyncReady] = useState(false);
 
   // Disable localStorage writes in guest mode
   useEffect(() => {
@@ -437,11 +439,13 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!guestChosen || user) return;
     dispatch({ type: 'SET_ACTIVE_USER', userId: 'guest', name: 'Guest' });
+    setSyncReady(true); // guests need no remote fetch
   }, [guestChosen]);
 
   // Fetch remote data and merge after login; push any local-only sessions (one-time migration)
   useEffect(() => {
     if (!user) return;
+    setSyncReady(false); // block START_SESSION until merge completes
     const localSessions = getActiveProfile(state).sessions;
     (async () => {
       const [sessions, customPlan, remoteProfile] = await Promise.all([
@@ -450,6 +454,7 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
         fetchProfile(user.id),
       ]);
       dispatch({ type: 'MERGE_REMOTE', sessions, customPlan, remoteProfile });
+      setSyncReady(true); // unblock after merge — todaySession is now populated from remote
       const remoteDates = new Set(Object.keys(sessions));
       for (const session of Object.values(localSessions)) {
         if (!remoteDates.has(session.date)) {
@@ -504,7 +509,7 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
   const todayDayLabel = isRestDay ? 'Rest Day' : (plan.days[dayIndex]?.label ?? 'Workout');
 
   return (
-    <WorkoutContext.Provider value={{ state, dispatch, profile, todaySession, todayDayLabel, isRestDay }}>
+    <WorkoutContext.Provider value={{ state, dispatch, profile, todaySession, todayDayLabel, isRestDay, syncReady }}>
       {children}
     </WorkoutContext.Provider>
   );

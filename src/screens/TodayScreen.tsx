@@ -15,7 +15,7 @@ function getDailyQuote() {
 }
 
 export default function TodayScreen() {
-  const { profile, todaySession, isRestDay } = useWorkout();
+  const { profile, todaySession, isRestDay, syncReady } = useWorkout();
   const dispatch = useDispatch();
   const plan = getEffectivePlan(profile);
   const scheduledIndex = getTodayDayIndexFromPlan(plan, profile.settings.cycleAnchorDate);
@@ -25,10 +25,9 @@ export default function TodayScreen() {
   const quote = getDailyQuote();
 
   useEffect(() => {
-    if (!isRestDay && !todaySession) {
-      dispatch({ type: 'START_SESSION' });
-    }
-  }, []);
+    if (!syncReady || isRestDay || todaySession) return;
+    dispatch({ type: 'START_SESSION' });
+  }, [syncReady]);
 
   function handleDaySelect(idx: number) {
     if (idx === activeDayIndex) return;
