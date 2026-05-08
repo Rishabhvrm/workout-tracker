@@ -1,6 +1,6 @@
 import { useRestTimer } from '../../context/RestTimerContext';
 
-const RADIUS = 26;
+const RADIUS = 36;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 function formatTime(seconds: number) {
@@ -18,60 +18,55 @@ export default function RestTimerOverlay() {
   const offset = CIRCUMFERENCE * (1 - progress);
   const isDone = timeLeft === 0;
 
-  // Color transitions: orange → yellow → green(done)
   const ringColor = isDone ? '#22c55e' : progress > 0.5 ? '#f97316' : '#facc15';
 
   return (
     <div
-      className="fixed left-4 right-4 z-40 flex items-center gap-4 px-4 py-3 rounded-2xl shadow-2xl border border-gray-700"
+      className="fixed inset-x-6 z-40 rounded-2xl border border-gray-700 shadow-2xl p-6 flex flex-col items-center gap-4"
       style={{
-        bottom: 'calc(68px + env(safe-area-inset-bottom))',
+        top: '50%',
+        transform: 'translateY(-50%)',
         background: 'linear-gradient(135deg, #1f2937, #111827)',
       }}
     >
+      <p className="text-xs text-gray-500 uppercase tracking-wider">Rest Timer</p>
+
       {/* Circular progress ring */}
-      <div className="relative flex-shrink-0 w-14 h-14 flex items-center justify-center">
-        <svg width="56" height="56" className="-rotate-90">
-          {/* Track */}
-          <circle cx="28" cy="28" r={RADIUS} fill="none" stroke="#374151" strokeWidth="3" />
-          {/* Progress */}
+      <div className="relative flex items-center justify-center">
+        <svg width="96" height="96" className="-rotate-90">
+          <circle cx="48" cy="48" r={RADIUS} fill="none" stroke="#374151" strokeWidth="4" />
           <circle
-            cx="28" cy="28" r={RADIUS}
+            cx="48" cy="48" r={RADIUS}
             fill="none"
             stroke={ringColor}
-            strokeWidth="3"
+            strokeWidth="4"
             strokeLinecap="round"
             strokeDasharray={CIRCUMFERENCE}
             strokeDashoffset={offset}
             style={{ transition: 'stroke-dashoffset 0.8s linear, stroke 0.3s' }}
           />
         </svg>
-        <span className={`absolute text-sm font-bold tabular-nums ${isDone ? 'text-green-400' : 'text-white'}`}>
+        <span className={`absolute text-3xl font-bold tabular-nums ${isDone ? 'text-green-400' : 'text-white'}`}>
           {isDone ? '✓' : formatTime(timeLeft)}
         </span>
       </div>
 
-      {/* Label */}
-      <div className="flex-1 min-w-0">
-        <p className="text-xs text-gray-500 uppercase tracking-wider">Rest</p>
-        <p className={`text-sm font-semibold ${isDone ? 'text-green-400' : 'text-white'}`}>
-          {isDone ? 'Ready to go!' : `${formatTime(timeLeft)} remaining`}
-        </p>
-      </div>
+      <p className={`text-sm font-medium ${isDone ? 'text-green-400' : 'text-gray-300'}`}>
+        {isDone ? 'Ready to go!' : `${formatTime(timeLeft)} remaining`}
+      </p>
 
-      {/* Controls */}
-      <div className="flex items-center gap-2 flex-shrink-0">
+      <div className="flex gap-3">
         {!isDone && (
           <button
             onClick={() => addTime(15)}
-            className="text-xs text-gray-400 bg-gray-800 hover:bg-gray-700 px-2.5 py-1.5 rounded-lg font-medium transition-colors"
+            className="px-5 py-2.5 rounded-xl text-sm font-medium text-gray-300 bg-gray-800 hover:bg-gray-700 transition-colors"
           >
             +15s
           </button>
         )}
         <button
           onClick={stop}
-          className="text-xs text-gray-400 bg-gray-800 hover:bg-gray-700 px-2.5 py-1.5 rounded-lg font-medium transition-colors"
+          className="px-5 py-2.5 rounded-xl text-sm font-medium text-gray-300 bg-gray-800 hover:bg-gray-700 transition-colors"
         >
           {isDone ? 'Dismiss' : 'Skip'}
         </button>

@@ -1,6 +1,6 @@
 import type { WorkoutSession } from '../../types';
 import { formatDuration } from '../../utils/dateUtils';
-import { useDispatch } from '../../context/WorkoutContext';
+import { useDispatch, useWorkout } from '../../context/WorkoutContext';
 
 interface Props {
   session: WorkoutSession;
@@ -14,8 +14,20 @@ function calcVolume(session: WorkoutSession): number {
 
 export default function WorkoutComplete({ session }: Props) {
   const dispatch = useDispatch();
+  const { profile } = useWorkout();
   const volume = calcVolume(session);
   const duration = formatDuration(session.startedAt, session.completedAt);
+
+  const prCount = session.exercises.reduce((count, ex) => {
+    const todayMax = Math.max(0, ...ex.sets.map(s => s.weight ?? 0));
+    if (todayMax === 0) return count;
+    const prevWeights = Object.values(profile.sessions)
+      .filter(s => s.date < session.date)
+      .flatMap(s => s.exercises.filter(e => e.exerciseId === ex.exerciseId))
+      .flatMap(e => e.sets.map(s => s.weight ?? 0));
+    if (prevWeights.length === 0) return count;
+    return todayMax > Math.max(...prevWeights) ? count + 1 : count;
+  }, 0);
 
   return (
     <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
@@ -27,7 +39,7 @@ export default function WorkoutComplete({ session }: Props) {
       <h2 className="text-2xl font-bold text-white mb-2">Workout Complete!</h2>
       <p className="text-gray-400 mb-8">{session.dayLabel} · {duration}</p>
 
-      <div className="grid grid-cols-2 gap-4 w-full max-w-xs mb-8">
+      <div className={`grid gap-4 w-full mb-8 ${prCount > 0 ? 'grid-cols-3 max-w-sm' : 'grid-cols-2 max-w-xs'}`}>
         <div className="bg-gray-900 rounded-xl p-4">
           <p className="text-3xl font-bold text-orange-400">{session.exercises.filter(e => e.completed).length}</p>
           <p className="text-xs text-gray-500 mt-1">exercises done</p>
@@ -36,6 +48,12 @@ export default function WorkoutComplete({ session }: Props) {
           <p className="text-3xl font-bold text-orange-400">{volume > 0 ? volume.toLocaleString() : '—'}</p>
           <p className="text-xs text-gray-500 mt-1">total volume</p>
         </div>
+        {prCount > 0 && (
+          <div className="bg-gray-900 rounded-xl p-4">
+            <p className="text-3xl font-bold text-amber-400">{prCount}</p>
+            <p className="text-xs text-gray-500 mt-1">new PR{prCount > 1 ? 's' : ''}</p>
+          </div>
+        )}
       </div>
 
       <button

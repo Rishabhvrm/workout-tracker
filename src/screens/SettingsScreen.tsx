@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { exportStorageJson, importStorageJson } from '../services/storage';
 import { getTodayISO } from '../utils/dateUtils';
 import PlanEditor from '../components/settings/PlanEditor';
+import { onboardingTemplates } from '../data/onboardingTemplates';
 
 export default function SettingsScreen() {
   const { profile } = useWorkout();
@@ -132,6 +133,35 @@ export default function SettingsScreen() {
           ) : (
             <p className="text-xs text-gray-500 mt-1">Today is a rest day</p>
           )}
+
+          {/* Template switcher */}
+          <div className="mt-3 pt-3 border-t border-gray-800">
+            <p className="text-xs text-gray-500 mb-2">Switch template</p>
+            <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+              {onboardingTemplates.map(t => {
+                const activePlanId = profile.customPlan?.id ?? profile.settings.defaultPlanId;
+                const isActive = t.plan.id === activePlanId;
+                return (
+                  <button
+                    key={t.id}
+                    onClick={() => {
+                      if (isActive) return;
+                      if (confirm(`Switch to ${t.name}? Your workout history will be preserved.`)) {
+                        dispatch({ type: 'IMPORT_PLAN', plan: t.plan });
+                      }
+                    }}
+                    className={`flex-shrink-0 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                      isActive
+                        ? 'bg-orange-500 text-white'
+                        : 'bg-gray-800 text-gray-400 hover:text-orange-300 hover:border-orange-500/40 border border-gray-700'
+                    }`}
+                  >
+                    {t.name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
           {!plan.weeklySchedule && (
             <div className="mt-3 pt-3 border-t border-gray-800">

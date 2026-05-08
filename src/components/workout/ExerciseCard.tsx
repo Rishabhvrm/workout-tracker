@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import type { SessionExercise } from '../../types';
+import type { SessionExercise, SessionSet } from '../../types';
 import { useWorkout, useDispatch } from '../../context/WorkoutContext';
+import { exerciseTips } from '../../data/exerciseTips';
 import PickerSheet, { weightValues, repsValues } from '../ui/PickerSheet';
 import ExerciseInfoSheet from './ExerciseInfoSheet';
 import { useRestTimer } from '../../context/RestTimerContext';
+import { getTodayISO } from '../../utils/dateUtils';
 
 interface Props {
   exercise: SessionExercise;
@@ -17,9 +19,24 @@ export default function ExerciseCard({ exercise, notes }: Props) {
   const dispatch = useDispatch();
   const { start: startTimer } = useRestTimer();
   const unit = profile.settings.weightUnit;
+
+  const today = getTodayISO();
+  let lastExercise: SessionExercise | null = null;
+  for (const s of Object.values(profile.sessions).sort((a, b) => b.date.localeCompare(a.date))) {
+    if (s.date >= today) continue;
+    const found = s.exercises.find(e => e.exerciseId === exercise.exerciseId);
+    if (found) { lastExercise = found; break; }
+  }
+  const prevWeights = Object.values(profile.sessions)
+    .filter(s => s.date < today)
+    .flatMap(s => s.exercises.filter(e => e.exerciseId === exercise.exerciseId))
+    .flatMap(e => e.sets.map(s => s.weight ?? 0));
+  const allTimeMaxWeight = prevWeights.length > 0 ? Math.max(...prevWeights) : 0;
+
   const [expanded, setExpanded] = useState(!exercise.completed);
   const [picker, setPicker] = useState<PickerTarget>(null);
   const [showInfo, setShowInfo] = useState(false);
+  const [prSetIndices, setPrSetIndices] = useState<Set<number>>(new Set());
 
   function toggle() {
     dispatch({ type: 'TOGGLE_EXERCISE', exerciseId: exercise.exerciseId });
@@ -69,17 +86,18 @@ export default function ExerciseCard({ exercise, notes }: Props) {
 
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-500">{exercise.sets.length} sets</span>
-            {/* Info button */}
-            <button
+            {/* Tips button — only show when there's something to display */}
+            {(exerciseTips[exercise.exerciseId] || notes) && <button
               onClick={e => { e.stopPropagation(); setShowInfo(true); }}
-              className="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center text-gray-500 hover:text-orange-400 hover:bg-gray-700 transition-colors flex-shrink-0"
+              className="flex flex-col items-center gap-0.5 p-1 text-gray-500 hover:text-orange-400 transition-colors flex-shrink-0"
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-3.5 h-3.5">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="8" strokeWidth={3} strokeLinecap="round" />
-                <line x1="12" y1="12" x2="12" y2="16" strokeLinecap="round" />
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
+                <path d="M9 18h6" />
+                <path d="M10 22h4" />
               </svg>
-            </button>
+              <span className="text-[9px] leading-none font-medium">Tips</span>
+            </button>}
             <svg
               viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}
               className={`w-4 h-4 text-gray-600 transition-transform flex-shrink-0 ${expanded ? 'rotate-180' : ''}`}
@@ -101,7 +119,9 @@ export default function ExerciseCard({ exercise, notes }: Props) {
               <span />
             </div>
 
-            {exercise.sets.map((set, i) => (
+            {exercise.sets.map((set, i) => {
+              const prevSet: SessionSet | undefined = lastExercise?.sets[i];
+              return (
               <div key={i} className="grid gap-2 items-center mb-2" style={{ gridTemplateColumns: '1.5rem 2.5rem 1fr 1fr 1.5rem' }}>
                 {/* Set number */}
                 <span className="text-sm text-gray-400 font-medium">{set.setNumber}</span>
@@ -112,28 +132,41 @@ export default function ExerciseCard({ exercise, notes }: Props) {
                 {/* Actual reps — tap to pick */}
                 <button
                   onClick={() => setPicker({ exerciseId: exercise.exerciseId, setIndex: i, kind: 'reps' })}
-                  className={`h-10 rounded-xl text-sm font-medium text-center transition-all active:scale-95 ${
+                  className={`min-h-10 py-1.5 rounded-xl text-sm font-medium text-center transition-all active:scale-95 flex flex-col items-center justify-center gap-0.5 ${
                     set.actualReps !== null
                       ? 'bg-orange-500/20 text-orange-300 border border-orange-500/40'
                       : 'bg-gray-800 text-gray-500 border border-gray-700'
                   }`}
                 >
-                  {set.actualReps !== null ? set.actualReps : '—'}
+                  <span>{set.actualReps !== null ? set.actualReps : '—'}</span>
+                  {prevSet?.actualReps != null && (
+                    <span className="text-[10px] text-gray-600 leading-none">{prevSet.actualReps}</span>
+                  )}
                 </button>
 
                 {/* Weight — tap to pick */}
-                <button
-                  onClick={() => setPicker({ exerciseId: exercise.exerciseId, setIndex: i, kind: 'weight' })}
-                  className={`h-10 rounded-xl text-sm font-medium text-center transition-all active:scale-95 ${
-                    set.weight !== null && set.weight > 0
-                      ? 'bg-blue-500/20 text-blue-300 border border-blue-500/40'
-                      : set.weight === 0
-                      ? 'bg-gray-800 text-gray-400 border border-gray-700'
-                      : 'bg-gray-800 text-gray-500 border border-gray-700'
-                  }`}
-                >
-                  {set.weight !== null ? (set.weight === 0 ? 'BW' : set.weight) : '—'}
-                </button>
+                <div className="relative">
+                  <button
+                    onClick={() => setPicker({ exerciseId: exercise.exerciseId, setIndex: i, kind: 'weight' })}
+                    className={`w-full min-h-10 py-1.5 rounded-xl text-sm font-medium text-center transition-all active:scale-95 flex flex-col items-center justify-center gap-0.5 ${
+                      set.weight !== null && set.weight > 0
+                        ? 'bg-blue-500/20 text-blue-300 border border-blue-500/40'
+                        : set.weight === 0
+                        ? 'bg-gray-800 text-gray-400 border border-gray-700'
+                        : 'bg-gray-800 text-gray-500 border border-gray-700'
+                    }`}
+                  >
+                    <span>{set.weight !== null ? (set.weight === 0 ? 'BW' : set.weight) : '—'}</span>
+                    {prevSet?.weight != null && (
+                      <span className="text-[10px] text-gray-600 leading-none">
+                        {prevSet.weight === 0 ? 'BW' : prevSet.weight}
+                      </span>
+                    )}
+                  </button>
+                  {prSetIndices.has(i) && (
+                    <span className="absolute -top-1 -right-1 text-[9px] font-bold text-amber-400 leading-none pointer-events-none">PR</span>
+                  )}
+                </div>
 
                 {/* Remove set — only show when more than 1 set */}
                 {exercise.sets.length > 1 ? (
@@ -149,7 +182,8 @@ export default function ExerciseCard({ exercise, notes }: Props) {
                   <span />
                 )}
               </div>
-            ))}
+              );
+            })}
 
             {/* Add set */}
             <button
@@ -181,6 +215,9 @@ export default function ExerciseCard({ exercise, notes }: Props) {
               weight: v as number,
             });
             startTimer(profile.settings.restTimerSeconds);
+            if ((v as number) > 0 && allTimeMaxWeight > 0 && (v as number) > allTimeMaxWeight) {
+              setPrSetIndices(prev => new Set(prev).add(picker!.setIndex));
+            }
           }}
           onClose={() => setPicker(null)}
         />

@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { useWorkout } from '../context/WorkoutContext';
-import { workoutPlans } from '../data/workoutPlans';
+import { useWorkout, getEffectivePlan } from '../context/WorkoutContext';
 import ProgressChart from '../components/progress/ProgressChart';
 
 export default function ProgressScreen() {
@@ -8,7 +7,7 @@ export default function ProgressScreen() {
   const unit = profile.settings.weightUnit;
   const sessions = Object.values(profile.sessions).sort((a, b) => a.date.localeCompare(b.date));
 
-  const plan = workoutPlans[profile.settings.defaultPlanId];
+  const plan = getEffectivePlan(profile);
   const allExercises = plan.days.flatMap(d => d.exercises);
 
   const [selectedId, setSelectedId] = useState(allExercises[0]?.id ?? '');

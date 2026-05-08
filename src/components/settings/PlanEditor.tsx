@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useWorkout, useDispatch, getEffectivePlan } from '../../context/WorkoutContext';
+import { useToast } from '../../context/ToastContext';
 import type { Exercise } from '../../types';
 import { parsePlanMd, generatePlanId } from '../../utils/parsePlanMd';
 
 export default function PlanEditor() {
   const { profile } = useWorkout();
   const dispatch = useDispatch();
+  const { showToast } = useToast();
   const plan = getEffectivePlan(profile);
   const unit = profile.settings.weightUnit;
 
@@ -26,7 +28,7 @@ export default function PlanEditor() {
           dispatch({ type: 'IMPORT_PLAN', plan: parsed });
         }
       } else {
-        alert('Could not parse the file. Make sure it uses the same format as the lean bulk template.');
+        showToast('Could not parse the file. Make sure it uses the same format as the lean bulk template.', 'error');
       }
     };
     reader.readAsText(file);
@@ -45,10 +47,10 @@ export default function PlanEditor() {
             dispatch({ type: 'IMPORT_PLAN', plan: parsed });
           }
         } else {
-          alert('Invalid plan JSON format.');
+          showToast('Invalid plan JSON format.', 'error');
         }
       } catch {
-        alert('Could not parse JSON file.');
+        showToast('Could not parse JSON file.', 'error');
       }
     };
     reader.readAsText(file);

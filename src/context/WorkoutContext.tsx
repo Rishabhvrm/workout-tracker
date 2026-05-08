@@ -317,7 +317,12 @@ function reducer(state: AppStorage, action: Action): AppStorage {
       const { userId, name } = action;
       const existingProfile = state.profiles[userId];
       if (existingProfile) {
-        const next = { ...state, activeProfileId: userId };
+        // Migrate existing guest profiles from the advanced default to beginner
+        const shouldMigrate = userId === 'guest' && existingProfile.settings.defaultPlanId === DEFAULT_PLAN_ID && !existingProfile.customPlan;
+        const updatedProfile = shouldMigrate
+          ? { ...existingProfile, settings: { ...existingProfile.settings, defaultPlanId: 'beginner-4day' } }
+          : existingProfile;
+        const next = { ...state, activeProfileId: userId, profiles: { ...state.profiles, [userId]: updatedProfile } };
         writeStorage(next);
         return next;
       }
@@ -327,7 +332,7 @@ function reducer(state: AppStorage, action: Action): AppStorage {
         name,
         createdAt: today,
         settings: {
-          defaultPlanId: DEFAULT_PLAN_ID,
+          defaultPlanId: 'beginner-4day',
           weightUnit: 'lbs',
           restTimerSeconds: 90,
           cycleAnchorDate: today,
@@ -410,7 +415,7 @@ const WorkoutContext = createContext<WorkoutContextValue | null>(null);
 
 export function WorkoutProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, undefined, readStorage);
-  const { user, isGuest } = useAuth();
+  const { user, isGuest, guestChosen } = useAuth();
   const syncTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Disable localStorage writes in guest mode
@@ -425,9 +430,16 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: 'SET_ACTIVE_USER', userId: user.id, name });
   }, [user?.id]);
 
-  // Fetch remote data and merge after login
+  // Switch to the guest profile (beginner plan) when guest mode is chosen
+  useEffect(() => {
+    if (!guestChosen || user) return;
+    dispatch({ type: 'SET_ACTIVE_USER', userId: 'guest', name: 'Guest' });
+  }, [guestChosen]);
+
+  // Fetch remote data and merge after login; push any local-only sessions (one-time migration)
   useEffect(() => {
     if (!user) return;
+    const localSessions = getActiveProfile(state).sessions;
     (async () => {
       const [sessions, customPlan, remoteProfile] = await Promise.all([
         fetchSessions(user.id),
@@ -435,6 +447,12 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
         fetchProfile(user.id),
       ]);
       dispatch({ type: 'MERGE_REMOTE', sessions, customPlan, remoteProfile });
+      const remoteDates = new Set(Object.keys(sessions));
+      for (const session of Object.values(localSessions)) {
+        if (!remoteDates.has(session.date)) {
+          upsertSession(user.id, session).catch(console.error);
+        }
+      }
     })();
   }, [user?.id]);
 

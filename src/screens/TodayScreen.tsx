@@ -182,11 +182,17 @@ export default function TodayScreen() {
           <div className="text-gray-600 text-center py-12 text-sm">Loading…</div>
         )}
 
-        {allDone && todaySession && (
-          <button onClick={() => dispatch({ type: 'COMPLETE_WORKOUT' })}
-            className="mt-6 w-full py-4 rounded-2xl text-lg font-bold text-white active:scale-95 transition-transform"
-            style={{ background: 'linear-gradient(135deg, #f97316, #ea580c)', boxShadow: '0 8px 24px rgba(249,115,22,0.35)' }}>
-            Finish Workout 🎉
+        {total > 0 && todaySession && (
+          <button
+            onClick={() => {
+              if (allDone || confirm(`Finish workout? ${total - doneCount} exercise(s) not completed.`)) {
+                dispatch({ type: 'COMPLETE_WORKOUT' });
+              }
+            }}
+            className={`mt-6 w-full py-4 rounded-2xl text-lg font-bold text-white active:scale-95 transition-transform ${allDone ? '' : 'bg-gray-700'}`}
+            style={allDone ? { background: 'linear-gradient(135deg, #f97316, #ea580c)', boxShadow: '0 8px 24px rgba(249,115,22,0.35)' } : undefined}
+          >
+            {allDone ? 'Finish Workout 🎉' : 'Finish Early'}
           </button>
         )}
 

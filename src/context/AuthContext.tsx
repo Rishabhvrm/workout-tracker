@@ -38,10 +38,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         supabase.auth.setSession({ access_token, refresh_token }).then(({ data }) => {
           setUser(data.session?.user ?? null);
           setLoading(false);
+          localStorage.removeItem('wt_new_user');
           // Clean the URL so HashRouter doesn't see it as a route
           window.history.replaceState(null, '', window.location.pathname);
         });
-        setIsNewUser(sessionStorage.getItem('wt_new_user') === '1');
         return;
       }
     }
@@ -54,9 +54,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       setLoading(false);
+      if (session?.user) localStorage.removeItem('wt_new_user');
     });
-
-    setIsNewUser(sessionStorage.getItem('wt_new_user') === '1');
 
     return () => subscription.unsubscribe();
   }, []);
@@ -76,7 +75,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
     if (error) return error.message;
     // Name is written by the DB trigger via raw_user_meta_data — no separate update needed.
-    sessionStorage.setItem('wt_new_user', '1');
+    localStorage.setItem('wt_new_user', '1');
     setIsNewUser(true);
     return null;
   }
@@ -102,7 +101,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   function clearNewUserFlag() {
-    sessionStorage.removeItem('wt_new_user');
+    localStorage.removeItem('wt_new_user');
     setIsNewUser(false);
   }
 

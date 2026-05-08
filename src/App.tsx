@@ -2,16 +2,16 @@ import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { WorkoutProvider } from './context/WorkoutContext';
 import { RestTimerProvider } from './context/RestTimerContext';
+import { ToastProvider } from './context/ToastContext';
 import AppShell from './components/layout/AppShell';
 import TodayScreen from './screens/TodayScreen';
 import HistoryScreen from './screens/HistoryScreen';
 import ProgressScreen from './screens/ProgressScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import AuthScreen from './screens/auth/AuthScreen';
-import OnboardingScreen from './screens/onboarding/OnboardingScreen';
 
 function AppRoutes() {
-  const { loading, user, guestChosen, isNewUser } = useAuth();
+  const { loading, user, guestChosen } = useAuth();
 
   if (loading) {
     return (
@@ -24,11 +24,6 @@ function AppRoutes() {
   // Show auth screen until user chooses to log in or continue as guest
   if (!user && !guestChosen) {
     return <AuthScreen />;
-  }
-
-  // New user just signed up → onboarding wizard
-  if (isNewUser) {
-    return <OnboardingScreen />;
   }
 
   return (
@@ -48,12 +43,14 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <WorkoutProvider>
-        <RestTimerProvider>
-          <AppRoutes />
-        </RestTimerProvider>
-      </WorkoutProvider>
-    </AuthProvider>
+    <ToastProvider>
+      <AuthProvider>
+        <WorkoutProvider>
+          <RestTimerProvider>
+            <AppRoutes />
+          </RestTimerProvider>
+        </WorkoutProvider>
+      </AuthProvider>
+    </ToastProvider>
   );
 }

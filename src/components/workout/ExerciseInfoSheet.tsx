@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { exerciseTips } from '../../data/exerciseTips';
 
 interface Props {
@@ -10,11 +11,16 @@ interface Props {
 export default function ExerciseInfoSheet({ exerciseId, exerciseName, notes, onClose }: Props) {
   const tip = exerciseTips[exerciseId];
 
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = ''; };
+  }, []);
+
   return (
-    <div className="fixed inset-0 z-50 flex items-end" onClick={onClose}>
+    <div className="fixed inset-0 z-[60] flex items-end overflow-hidden" onClick={onClose}>
       <div className="absolute inset-0 bg-black/70" />
       <div
-        className="relative w-full bg-gray-900 rounded-t-2xl max-h-[80vh] overflow-y-auto"
+        className="relative w-full bg-gray-900 rounded-t-2xl max-h-[80vh] overflow-y-auto overscroll-contain"
         onClick={e => e.stopPropagation()}
       >
         {/* Handle */}
@@ -22,7 +28,7 @@ export default function ExerciseInfoSheet({ exerciseId, exerciseName, notes, onC
           <div className="w-10 h-1 bg-gray-700 rounded-full" />
         </div>
 
-        <div className="px-5 pb-8 pt-2">
+        <div className="px-5 pt-2" style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}>
           {/* Header */}
           <div className="flex items-start justify-between mb-5">
             <div>

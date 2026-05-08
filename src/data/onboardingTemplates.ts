@@ -74,7 +74,7 @@ const cutPlan: WorkoutPlan = {
   days: [
     {
       id: 'upper-a',
-      label: 'Upper A',
+      label: 'Chest & Back',
       goal: 'Chest & back — high volume, shorter rest',
       exercises: [
         { id: 'cut-bench', name: 'Barbell Bench Press', sets: 4, reps: '10–12', defaultWeightLbs: 115, defaultWeightKg: 52 },
@@ -87,7 +87,7 @@ const cutPlan: WorkoutPlan = {
     },
     {
       id: 'lower-a',
-      label: 'Lower A',
+      label: 'Squat & Legs',
       goal: 'Quad dominant — volume focus',
       exercises: [
         { id: 'cut-squat', name: 'Barbell Squat', sets: 4, reps: '10–12', defaultWeightLbs: 115, defaultWeightKg: 52 },
@@ -99,7 +99,7 @@ const cutPlan: WorkoutPlan = {
     },
     {
       id: 'upper-b',
-      label: 'Upper B',
+      label: 'Shoulders & Arms',
       goal: 'Shoulders & back — high rep isolation',
       exercises: [
         { id: 'cut-incline', name: 'Incline DB Press', sets: 4, reps: '12', defaultWeightLbs: 40, defaultWeightKg: 18 },
@@ -112,7 +112,7 @@ const cutPlan: WorkoutPlan = {
     },
     {
       id: 'lower-b',
-      label: 'Lower B',
+      label: 'Deadlift & Glutes',
       goal: 'Hip dominant — glutes & hamstrings',
       exercises: [
         { id: 'cut-dl', name: 'Deadlift', sets: 4, reps: '8', defaultWeightLbs: 155, defaultWeightKg: 70 },
@@ -172,6 +172,13 @@ const homePlan: WorkoutPlan = {
 };
 
 export const onboardingTemplates: OnboardingTemplate[] = [
+  {
+    id: 'beginner-4day',
+    name: 'Beginner',
+    description: 'Upper/Lower 4-day split — compound movements, manageable volume, 2 rest days mid-week',
+    daysPerWeek: 4,
+    plan: workoutPlans['beginner-4day'],
+  },
   {
     id: 'lean-bulk-5day',
     name: 'Lean Bulk',
