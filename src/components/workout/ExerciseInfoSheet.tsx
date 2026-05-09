@@ -12,8 +12,14 @@ export default function ExerciseInfoSheet({ exerciseId, exerciseName, notes, onC
   const tip = exerciseTips[exerciseId];
 
   useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = ''; };
+    const main = document.querySelector<HTMLElement>('main');
+    if (main) main.style.overflow = 'hidden';
+    const prevent = (e: TouchEvent) => e.preventDefault();
+    document.addEventListener('touchmove', prevent, { passive: false });
+    return () => {
+      if (main) main.style.overflow = '';
+      document.removeEventListener('touchmove', prevent);
+    };
   }, []);
 
   return (
@@ -22,6 +28,7 @@ export default function ExerciseInfoSheet({ exerciseId, exerciseName, notes, onC
       <div
         className="relative w-full bg-gray-900 rounded-t-2xl max-h-[80vh] overflow-y-auto overscroll-contain"
         onClick={e => e.stopPropagation()}
+        onTouchMove={e => e.stopPropagation()}
       >
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1 sticky top-0 bg-gray-900">

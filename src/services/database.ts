@@ -66,11 +66,8 @@ export async function fetchCustomPlan(userId: string): Promise<WorkoutPlan | nul
     .from('custom_plans')
     .select('plan_data')
     .eq('user_id', userId)
-    .single();
-  if (error) {
-    if (error.code !== 'PGRST116') console.error('fetchCustomPlan:', error.message);
-    return null;
-  }
+    .maybeSingle();
+  if (error) { console.error('fetchCustomPlan:', error.message); return null; }
   return (data?.plan_data as WorkoutPlan) ?? null;
 }
 
