@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { exerciseTips } from '../../data/exerciseTips';
 
 interface Props {
@@ -10,15 +10,22 @@ interface Props {
 
 export default function ExerciseInfoSheet({ exerciseId, exerciseName, notes, onClose }: Props) {
   const tip = exerciseTips[exerciseId];
+  const sheetScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const main = document.querySelector<HTMLElement>('main');
     if (main) main.style.overflow = 'hidden';
     const prevent = (e: TouchEvent) => e.preventDefault();
     document.addEventListener('touchmove', prevent, { passive: false });
+    // Native listener on the scrollable sheet div stops touchmove from reaching
+    // the document-level prevent handler, allowing the sheet itself to scroll.
+    const el = sheetScrollRef.current;
+    const stopProp = (e: TouchEvent) => e.stopPropagation();
+    if (el) el.addEventListener('touchmove', stopProp, { passive: false });
     return () => {
       if (main) main.style.overflow = '';
       document.removeEventListener('touchmove', prevent);
+      if (el) el.removeEventListener('touchmove', stopProp);
     };
   }, []);
 
@@ -26,9 +33,9 @@ export default function ExerciseInfoSheet({ exerciseId, exerciseName, notes, onC
     <div className="fixed inset-0 z-[60] flex items-end overflow-hidden" onClick={onClose}>
       <div className="absolute inset-0 bg-black/70" />
       <div
+        ref={sheetScrollRef}
         className="relative w-full bg-gray-900 rounded-t-2xl max-h-[80vh] overflow-y-auto overscroll-contain"
         onClick={e => e.stopPropagation()}
-        onTouchMove={e => e.stopPropagation()}
       >
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1 sticky top-0 bg-gray-900">
