@@ -355,7 +355,7 @@ function reducer(state: AppStorage, action: Action): AppStorage {
       const todayLocal = localProfile.sessions[today];
 
       const todayHasData = todayLocal?.exercises.some(e =>
-        e.sets.some(s => s.actualReps !== null || s.weight !== null)
+        e.completed || e.sets.some(s => s.actualReps !== null)
       );
       const mergedSessions: Record<string, WorkoutSession> = {
         ...action.sessions,
@@ -481,25 +481,39 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
     return () => document.removeEventListener('visibilitychange', handleVisibility);
   }, [user?.id]);
 
-  // Sync state to Supabase on changes (debounced 1.5s)
+  // Sync state to Supabase on changes; completed workouts sync immediately, others debounce 1.5s
   useEffect(() => {
     if (!user || isGuest) return;
     if (syncTimer.current) clearTimeout(syncTimer.current);
+    const profile = getActiveProfile(state);
+    const today = getTodayISO();
+    const session = profile.sessions[today];
+    const delay = session?.completedAt ? 0 : 1500;
     syncTimer.current = setTimeout(() => {
-      const profile = getActiveProfile(state);
       upsertProfile(user.id, {
         name: profile.name,
         weight_unit: profile.settings.weightUnit,
         rest_timer_seconds: profile.settings.restTimerSeconds,
         cycle_anchor_date: profile.settings.cycleAnchorDate,
       }).catch(console.error);
-      const today = getTodayISO();
-      const session = profile.sessions[today];
       if (session) upsertSession(user.id, session).catch(console.error);
       if (profile.customPlan) upsertCustomPlan(user.id, profile.customPlan).catch(console.error);
-    }, 1500);
+    }, delay);
     return () => { if (syncTimer.current) clearTimeout(syncTimer.current); };
   }, [state, user?.id, isGuest]);
+
+  // Poll Supabase every 30s while the tab is visible to pick up changes from other devices
+  useEffect(() => {
+    if (!user) return;
+    const poll = setInterval(() => {
+      if (document.visibilityState !== 'visible') return;
+      Promise.all([fetchSessions(user.id), fetchCustomPlan(user.id), fetchProfile(user.id)])
+        .then(([sessions, customPlan, remoteProfile]) => {
+          dispatch({ type: 'MERGE_REMOTE', sessions, customPlan, remoteProfile });
+        });
+    }, 30000);
+    return () => clearInterval(poll);
+  }, [user?.id]);
 
   const profile = getActiveProfile(state);
   const todaySession = profile.sessions[getTodayISO()];
