@@ -266,12 +266,47 @@ function reducer(state: AppStorage, action: Action): AppStorage {
         };
       });
       const updatedPlan = { ...plan, days: updatedDays };
+      let updatedProfile = { ...profile, customPlan: updatedPlan };
+      const todayU = getTodayISO();
+      const todaySessionU = updatedProfile.sessions[todayU];
+      if (todaySessionU) {
+        const p = action.patch;
+        updatedProfile = {
+          ...updatedProfile,
+          sessions: {
+            ...updatedProfile.sessions,
+            [todayU]: {
+              ...todaySessionU,
+              exercises: todaySessionU.exercises.map(e => {
+                if (e.exerciseId !== action.exerciseId) return e;
+                let sets = e.sets;
+                if (p.sets !== undefined && p.sets !== sets.length) {
+                  if (p.sets > sets.length) {
+                    const newReps = p.reps ?? sets[0]?.targetReps ?? '8-12';
+                    const extras = Array.from({ length: p.sets - sets.length }, (_, i) => ({
+                      setNumber: sets.length + i + 1,
+                      targetReps: newReps,
+                      actualReps: null,
+                      weight: sets[sets.length - 1]?.weight ?? null,
+                    }));
+                    sets = [...sets, ...extras];
+                  } else {
+                    sets = sets.slice(0, p.sets);
+                  }
+                  sets = sets.map((s, i) => ({ ...s, setNumber: i + 1 }));
+                }
+                if (p.reps) {
+                  sets = sets.map(s => ({ ...s, targetReps: p.reps! }));
+                }
+                return { ...e, ...(p.name ? { name: p.name } : {}), sets };
+              }),
+            },
+          },
+        };
+      }
       const next: AppStorage = {
         ...state,
-        profiles: {
-          ...state.profiles,
-          [state.activeProfileId]: { ...profile, customPlan: updatedPlan },
-        },
+        profiles: { ...state.profiles, [state.activeProfileId]: updatedProfile },
       };
       writeStorage(next);
       return next;
@@ -284,12 +319,35 @@ function reducer(state: AppStorage, action: Action): AppStorage {
         return { ...day, exercises: [...day.exercises, action.exercise] };
       });
       const updatedPlan = { ...plan, days: updatedDays };
+      let updatedProfile = { ...profile, customPlan: updatedPlan };
+      const todayA = getTodayISO();
+      const todaySessionA = updatedProfile.sessions[todayA];
+      if (todaySessionA) {
+        const unit = updatedProfile.settings.weightUnit;
+        const newSessionEx: SessionExercise = {
+          exerciseId: action.exercise.id,
+          name: action.exercise.name,
+          completed: false,
+          sets: Array.from({ length: action.exercise.sets }, (_, i) => ({
+            setNumber: i + 1,
+            targetReps: action.exercise.reps,
+            actualReps: null,
+            weight: unit === 'kg'
+              ? (action.exercise.defaultWeightKg ?? null)
+              : (action.exercise.defaultWeightLbs ?? null),
+          })),
+        };
+        updatedProfile = {
+          ...updatedProfile,
+          sessions: {
+            ...updatedProfile.sessions,
+            [todayA]: { ...todaySessionA, exercises: [...todaySessionA.exercises, newSessionEx] },
+          },
+        };
+      }
       const next: AppStorage = {
         ...state,
-        profiles: {
-          ...state.profiles,
-          [state.activeProfileId]: { ...profile, customPlan: updatedPlan },
-        },
+        profiles: { ...state.profiles, [state.activeProfileId]: updatedProfile },
       };
       writeStorage(next);
       return next;
@@ -302,12 +360,24 @@ function reducer(state: AppStorage, action: Action): AppStorage {
         return { ...day, exercises: day.exercises.filter(ex => ex.id !== action.exerciseId) };
       });
       const updatedPlan = { ...plan, days: updatedDays };
+      let updatedProfile = { ...profile, customPlan: updatedPlan };
+      const todayR = getTodayISO();
+      const todaySessionR = updatedProfile.sessions[todayR];
+      if (todaySessionR) {
+        updatedProfile = {
+          ...updatedProfile,
+          sessions: {
+            ...updatedProfile.sessions,
+            [todayR]: {
+              ...todaySessionR,
+              exercises: todaySessionR.exercises.filter(e => e.exerciseId !== action.exerciseId),
+            },
+          },
+        };
+      }
       const next: AppStorage = {
         ...state,
-        profiles: {
-          ...state.profiles,
-          [state.activeProfileId]: { ...profile, customPlan: updatedPlan },
-        },
+        profiles: { ...state.profiles, [state.activeProfileId]: updatedProfile },
       };
       writeStorage(next);
       return next;

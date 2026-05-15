@@ -176,7 +176,7 @@ export default function TodayScreen() {
         </div>
 
         {todaySession ? (
-          <ExerciseList exercises={todaySession.exercises} planId={todaySession.planId} />
+          <ExerciseList exercises={todaySession.exercises} planId={todaySession.planId} dayId={day.id} />
         ) : (
           <div className="text-gray-600 text-center py-12 text-sm">Loading…</div>
         )}

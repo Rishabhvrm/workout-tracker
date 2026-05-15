@@ -3,6 +3,7 @@ import { useWorkout, useDispatch, getEffectivePlan } from '../../context/Workout
 import { useToast } from '../../context/ToastContext';
 import type { Exercise } from '../../types';
 import { parsePlanMd, generatePlanId } from '../../utils/parsePlanMd';
+import EditExerciseModal from '../ui/EditExerciseModal';
 
 export default function PlanEditor() {
   const { profile } = useWorkout();
@@ -196,67 +197,6 @@ export default function PlanEditor() {
           onClose={() => setEditingEx(null)}
         />
       )}
-    </div>
-  );
-}
-
-function EditExerciseModal({ ex, unit, onSave, onClose }: {
-  ex: Exercise;
-  unit: string;
-  onSave: (patch: Partial<Exercise>) => void;
-  onClose: () => void;
-}) {
-  const [name, setName] = useState(ex.name);
-  const [sets, setSets] = useState(String(ex.sets));
-  const [reps, setReps] = useState(ex.reps);
-  const [defaultW, setDefaultW] = useState(String(unit === 'lbs' ? (ex.defaultWeightLbs ?? '') : (ex.defaultWeightKg ?? '')));
-  const [notes, setNotes] = useState(ex.notes ?? '');
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-end" onClick={onClose}>
-      <div className="absolute inset-0 bg-black/60" />
-      <div className="relative w-full bg-gray-900 rounded-t-2xl p-5" onClick={e => e.stopPropagation()}>
-        <h3 className="text-white font-semibold mb-4">Edit Exercise</h3>
-        <div className="space-y-3">
-          <div>
-            <label className="text-xs text-gray-500 block mb-1">Name</label>
-            <input value={name} onChange={e => setName(e.target.value)} className="w-full bg-gray-800 text-white px-3 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-orange-500" />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs text-gray-500 block mb-1">Sets</label>
-              <input type="number" inputMode="numeric" value={sets} onChange={e => setSets(e.target.value)} className="w-full bg-gray-800 text-white px-3 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-orange-500" />
-            </div>
-            <div>
-              <label className="text-xs text-gray-500 block mb-1">Reps</label>
-              <input value={reps} onChange={e => setReps(e.target.value)} placeholder="e.g. 8-12" className="w-full bg-gray-800 text-white px-3 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-orange-500" />
-            </div>
-          </div>
-          <div>
-            <label className="text-xs text-gray-500 block mb-1">Default weight ({unit})</label>
-            <input type="number" inputMode="decimal" value={defaultW} onChange={e => setDefaultW(e.target.value)} className="w-full bg-gray-800 text-white px-3 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-orange-500" />
-          </div>
-          <div>
-            <label className="text-xs text-gray-500 block mb-1">Notes (optional)</label>
-            <input value={notes} onChange={e => setNotes(e.target.value)} className="w-full bg-gray-800 text-white px-3 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-orange-500" />
-          </div>
-        </div>
-        <div className="flex gap-3 mt-5">
-          <button onClick={onClose} className="flex-1 bg-gray-800 text-gray-300 py-3 rounded-xl text-sm font-medium">Cancel</button>
-          <button
-            onClick={() => onSave({
-              name,
-              sets: parseInt(sets) || ex.sets,
-              reps,
-              notes: notes || undefined,
-              ...(unit === 'lbs' ? { defaultWeightLbs: parseFloat(defaultW) || 0 } : { defaultWeightKg: parseFloat(defaultW) || 0 }),
-            })}
-            className="flex-1 bg-orange-500 text-white py-3 rounded-xl text-sm font-bold"
-          >
-            Save
-          </button>
-        </div>
-      </div>
     </div>
   );
 }
