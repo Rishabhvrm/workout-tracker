@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useWorkout, useDispatch, getEffectivePlan } from '../../context/WorkoutContext';
 import { useToast } from '../../context/ToastContext';
+import { useConfirm } from '../../context/ConfirmContext';
 import type { Exercise } from '../../types';
 import { parsePlanMd, generatePlanId } from '../../utils/parsePlanMd';
 import EditExerciseModal from '../ui/EditExerciseModal';
@@ -9,6 +10,7 @@ export default function PlanEditor() {
   const { profile } = useWorkout();
   const dispatch = useDispatch();
   const { showToast } = useToast();
+  const { confirm } = useConfirm();
   const plan = getEffectivePlan(profile);
   const unit = profile.settings.weightUnit;
 
@@ -21,11 +23,11 @@ export default function PlanEditor() {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = ev => {
+    reader.onload = async ev => {
       const text = ev.target?.result as string;
       const parsed = parsePlanMd(text, generatePlanId());
       if (parsed) {
-        if (confirm(`Import "${parsed.name}" with ${parsed.days.length} days? This will replace your current plan.`)) {
+        if (await confirm({ title: `Import "${parsed.name}"?`, message: `${parsed.days.length} days — this will replace your current plan.`, confirmLabel: 'Import', destructive: true })) {
           dispatch({ type: 'IMPORT_PLAN', plan: parsed });
         }
       } else {
@@ -40,11 +42,11 @@ export default function PlanEditor() {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = ev => {
+    reader.onload = async ev => {
       try {
         const parsed = JSON.parse(ev.target?.result as string);
         if (parsed?.days?.length) {
-          if (confirm(`Import "${parsed.name}" with ${parsed.days.length} days?`)) {
+          if (await confirm({ title: `Import "${parsed.name}"?`, message: `${parsed.days.length} days`, confirmLabel: 'Import' })) {
             dispatch({ type: 'IMPORT_PLAN', plan: parsed });
           }
         } else {
@@ -96,7 +98,7 @@ export default function PlanEditor() {
         </label>
         {profile.customPlan && (
           <button
-            onClick={() => { if (confirm('Revert to the built-in plan?')) dispatch({ type: 'IMPORT_PLAN', plan: { ...plan, id: 'reset' } }); }}
+            onClick={async () => { if (await confirm({ title: 'Revert to built-in plan?', confirmLabel: 'Revert', destructive: true })) dispatch({ type: 'IMPORT_PLAN', plan: { ...plan, id: 'reset' } }); }}
             className="flex-1 bg-gray-800 text-red-400 text-xs font-medium py-2.5 rounded-xl"
           >
             Reset plan
@@ -146,7 +148,7 @@ export default function PlanEditor() {
                       </svg>
                     </button>
                     <button
-                      onClick={() => { if (confirm(`Remove "${ex.name}"?`)) dispatch({ type: 'REMOVE_EXERCISE', dayId: day.id, exerciseId: ex.id }); }}
+                      onClick={async () => { if (await confirm({ title: `Remove "${ex.name}"?`, confirmLabel: 'Remove', destructive: true })) dispatch({ type: 'REMOVE_EXERCISE', dayId: day.id, exerciseId: ex.id }); }}
                       className="p-1.5 text-gray-500 hover:text-red-400 flex-shrink-0"
                     >
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4">

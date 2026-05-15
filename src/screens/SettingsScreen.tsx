@@ -5,6 +5,8 @@ import { exportStorageJson, importStorageJson } from '../services/storage';
 import { getTodayISO } from '../utils/dateUtils';
 import PlanEditor from '../components/settings/PlanEditor';
 import { onboardingTemplates } from '../data/onboardingTemplates';
+import { useConfirm } from '../context/ConfirmContext';
+import { useToast } from '../context/ToastContext';
 
 export default function SettingsScreen() {
   const { profile } = useWorkout();
@@ -12,6 +14,8 @@ export default function SettingsScreen() {
   const { user, isGuest, signOut, showAuthScreen } = useAuth();
   const [showPlanEditor, setShowPlanEditor] = useState(false);
 
+  const { confirm } = useConfirm();
+  const { showToast } = useToast();
   const plan = getEffectivePlan(profile);
   const dayIndex = getTodayDayIndexFromPlan(plan, profile.settings.cycleAnchorDate);
 
@@ -20,9 +24,9 @@ export default function SettingsScreen() {
     if (!json) return;
     if (importStorageJson(json)) {
       dispatch({ type: 'RELOAD' });
-      alert('Data imported!');
+      showToast('Data imported!');
     } else {
-      alert('Invalid data.');
+      showToast('Invalid data.', 'error');
     }
   }
 
@@ -66,7 +70,7 @@ export default function SettingsScreen() {
                 </div>
               </div>
               <button
-                onClick={() => { if (confirm('Sign out?')) signOut(); }}
+                onClick={async () => { if (await confirm({ title: 'Sign out?', confirmLabel: 'Sign out', destructive: true })) signOut(); }}
                 className="text-xs text-gray-500 bg-gray-800 px-3 py-1.5 rounded-lg hover:text-red-400 transition-colors"
               >
                 Sign out
@@ -144,9 +148,9 @@ export default function SettingsScreen() {
                 return (
                   <button
                     key={t.id}
-                    onClick={() => {
+                    onClick={async () => {
                       if (isActive) return;
-                      if (confirm(`Switch to ${t.name}? Your workout history will be preserved.`)) {
+                      if (await confirm({ title: `Switch to ${t.name}?`, message: 'Your workout history will be preserved.' })) {
                         dispatch({ type: 'IMPORT_PLAN', plan: t.plan });
                       }
                     }}
@@ -167,7 +171,7 @@ export default function SettingsScreen() {
             <div className="mt-3 pt-3 border-t border-gray-800">
               <p className="text-xs text-gray-500 mb-1">Cycle anchor: {profile.settings.cycleAnchorDate}</p>
               <button
-                onClick={() => { if (confirm('Reset cycle to start from today?')) dispatch({ type: 'RESET_CYCLE' }); }}
+                onClick={async () => { if (await confirm({ title: 'Reset cycle to start from today?', confirmLabel: 'Reset', destructive: true })) dispatch({ type: 'RESET_CYCLE' }); }}
                 className="text-xs text-orange-400"
               >
                 Reset cycle to today →

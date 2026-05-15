@@ -7,6 +7,7 @@ import ExerciseInfoSheet from './ExerciseInfoSheet';
 import EditExerciseModal from '../ui/EditExerciseModal';
 import { useRestTimer } from '../../context/RestTimerContext';
 import { getTodayISO } from '../../utils/dateUtils';
+import { useConfirm } from '../../context/ConfirmContext';
 
 interface Props {
   exercise: SessionExercise;
@@ -20,6 +21,7 @@ export default function ExerciseCard({ exercise, notes, dayId }: Props) {
   const { profile } = useWorkout();
   const dispatch = useDispatch();
   const { start: startTimer } = useRestTimer();
+  const { confirm } = useConfirm();
   const unit = profile.settings.weightUnit;
   const plan = getEffectivePlan(profile);
   const planEx: Exercise = plan.days.flatMap(d => d.exercises).find(e => e.id === exercise.exerciseId) ?? {
@@ -123,9 +125,9 @@ export default function ExerciseCard({ exercise, notes, dayId }: Props) {
               </svg>
             </button>
             <button
-              onClick={e => {
+              onClick={async e => {
                 e.stopPropagation();
-                if (confirm(`Remove "${exercise.name}"?`)) {
+                if (await confirm({ title: `Remove "${exercise.name}"?`, confirmLabel: 'Remove', destructive: true })) {
                   dispatch({ type: 'REMOVE_EXERCISE', dayId, exerciseId: exercise.exerciseId });
                 }
               }}

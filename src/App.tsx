@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { WorkoutProvider } from './context/WorkoutContext';
 import { RestTimerProvider } from './context/RestTimerContext';
 import { ToastProvider } from './context/ToastContext';
+import { ConfirmProvider } from './context/ConfirmContext';
 import AppShell from './components/layout/AppShell';
 import TodayScreen from './screens/TodayScreen';
 import HistoryScreen from './screens/HistoryScreen';
@@ -44,13 +45,15 @@ function AppRoutes() {
 export default function App() {
   return (
     <ToastProvider>
-      <AuthProvider>
-        <WorkoutProvider>
-          <RestTimerProvider>
-            <AppRoutes />
-          </RestTimerProvider>
-        </WorkoutProvider>
-      </AuthProvider>
+      <ConfirmProvider>
+        <AuthProvider>
+          <WorkoutProvider>
+            <RestTimerProvider>
+              <AppRoutes />
+            </RestTimerProvider>
+          </WorkoutProvider>
+        </AuthProvider>
+      </ConfirmProvider>
     </ToastProvider>
   );
 }

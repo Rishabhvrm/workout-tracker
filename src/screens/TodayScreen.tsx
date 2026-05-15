@@ -4,6 +4,7 @@ import { formatDisplayDate, getTodayISO } from '../utils/dateUtils';
 import { motivationQuotes } from '../data/quotes';
 import ExerciseList from '../components/workout/ExerciseList';
 import WorkoutComplete from '../components/workout/WorkoutComplete';
+import { useConfirm } from '../context/ConfirmContext';
 
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -20,6 +21,7 @@ export default function TodayScreen() {
   const plan = getEffectivePlan(profile);
   const scheduledIndex = getTodayDayIndexFromPlan(plan, profile.settings.cycleAnchorDate);
 
+  const { confirm } = useConfirm();
   const [manualDayIndex, setManualDayIndex] = useState<number | null>(null);
   const activeDayIndex = manualDayIndex ?? (scheduledIndex >= 0 ? scheduledIndex : 0);
   const quote = getDailyQuote();
@@ -29,10 +31,10 @@ export default function TodayScreen() {
     dispatch({ type: 'START_SESSION' });
   }, [syncReady]);
 
-  function handleDaySelect(idx: number) {
+  async function handleDaySelect(idx: number) {
     if (idx === activeDayIndex) return;
     if (todaySession && !todaySession.completedAt) {
-      if (!confirm(`Switch to ${plan.days[idx].label}? This will reset today's session.`)) return;
+      if (!await confirm({ title: `Switch to ${plan.days[idx].label}?`, message: "This will reset today's session.", confirmLabel: 'Switch' })) return;
       dispatch({ type: 'RESET_TODAY' });
     }
     setManualDayIndex(idx);
@@ -183,8 +185,8 @@ export default function TodayScreen() {
 
         {total > 0 && todaySession && (
           <button
-            onClick={() => {
-              if (allDone || confirm(`Finish workout? ${total - doneCount} exercise(s) not completed.`)) {
+            onClick={async () => {
+              if (allDone || await confirm({ title: 'Finish workout early?', message: `${total - doneCount} exercise(s) not completed.`, confirmLabel: 'Finish' })) {
                 dispatch({ type: 'COMPLETE_WORKOUT' });
               }
             }}
@@ -196,7 +198,7 @@ export default function TodayScreen() {
         )}
 
         {todaySession && (
-          <button onClick={() => { if (confirm("Reset today's workout?")) dispatch({ type: 'RESET_TODAY' }); }}
+          <button onClick={async () => { if (await confirm({ title: "Reset today's workout?", confirmLabel: 'Reset', destructive: true })) dispatch({ type: 'RESET_TODAY' }); }}
             className="mt-3 w-full text-xs text-gray-700 py-2">
             Reset today
           </button>
