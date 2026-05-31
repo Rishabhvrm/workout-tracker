@@ -23,6 +23,7 @@ type Action =
   | { type: 'UPDATE_EXERCISE'; dayId: string; exerciseId: string; patch: Partial<import('../types').Exercise> }
   | { type: 'ADD_EXERCISE'; dayId: string; exercise: import('../types').Exercise }
   | { type: 'REMOVE_EXERCISE'; dayId: string; exerciseId: string }
+  | { type: 'RENAME_PLAN'; name: string }
   | { type: 'RELOAD' }
   | { type: 'SET_ACTIVE_USER'; userId: string; name: string }
   | { type: 'MERGE_REMOTE'; sessions: Record<string, WorkoutSession>; customPlan: WorkoutPlan | null; remoteProfile: DbProfile | null };
@@ -243,11 +244,13 @@ function reducer(state: AppStorage, action: Action): AppStorage {
     }
 
     case 'IMPORT_PLAN': {
+      const savedName = profile.settings.planNames?.[action.plan.id];
+      const newPlan = savedName ? { ...action.plan, name: savedName } : action.plan;
       const next: AppStorage = {
         ...state,
         profiles: {
           ...state.profiles,
-          [state.activeProfileId]: { ...profile, customPlan: action.plan },
+          [state.activeProfileId]: { ...profile, customPlan: newPlan },
         },
       };
       writeStorage(next);
@@ -383,6 +386,21 @@ function reducer(state: AppStorage, action: Action): AppStorage {
       return next;
     }
 
+    case 'RENAME_PLAN': {
+      const effectivePlan = getEffectivePlan(profile);
+      const renamedPlan = { ...(profile.customPlan ?? effectivePlan), name: action.name };
+      const updatedSettings = {
+        ...profile.settings,
+        planNames: { ...profile.settings.planNames, [renamedPlan.id]: action.name },
+      };
+      const next: AppStorage = {
+        ...state,
+        profiles: { ...state.profiles, [state.activeProfileId]: { ...profile, customPlan: renamedPlan, settings: updatedSettings } },
+      };
+      writeStorage(next);
+      return next;
+    }
+
     case 'SET_ACTIVE_USER': {
       const { userId, name } = action;
       const existingProfile = state.profiles[userId];
@@ -444,7 +462,7 @@ function reducer(state: AppStorage, action: Action): AppStorage {
         name: action.remoteProfile?.name ?? localProfile.name,
         settings: mergedSettings,
         sessions: mergedSessions,
-        customPlan: action.customPlan ?? localProfile.customPlan,
+        customPlan: localProfile.customPlan ?? action.customPlan,
       };
 
       const next: AppStorage = {

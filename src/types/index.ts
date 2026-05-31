@@ -26,6 +26,7 @@ export interface UserSettings {
   weightUnit: 'lbs' | 'kg';
   restTimerSeconds: number;
   cycleAnchorDate: string;
+  planNames?: Record<string, string>; // planId -> user-chosen name override
 }
 
 export interface CycleState {

@@ -148,6 +148,79 @@ workoutPlans['beginner-4day'] = {
   ],
 };
 
+workoutPlans['pdf-lean-bulk-5day'] = {
+  id: 'pdf-lean-bulk-5day',
+  name: 'My 5-Day Lean Bulk',
+  weeklySchedule: { 1: 0, 2: 1, 3: 2, 4: 3, 5: 4 },
+  restDays: [0, 6],
+  days: [
+    {
+      id: 'pdf-push',
+      label: 'Push',
+      goal: 'Chest thickness, shoulder caps',
+      exercises: [
+        { id: 'pdf-push-bench', name: 'Barbell Bench Press', sets: 4, reps: '6–8', notes: 'RPE 8–9 on last set.', defaultWeightLbs: 135, defaultWeightKg: 60 },
+        { id: 'pdf-push-lateral', name: 'Dumbbell/Cable Lateral Raise', sets: 4, reps: '12–15', notes: 'Controlled, no swinging.', defaultWeightLbs: 15, defaultWeightKg: 7 },
+        { id: 'pdf-push-incline', name: 'Incline Dumbbell Press', sets: 3, reps: '8–10', defaultWeightLbs: 30, defaultWeightKg: 14 },
+        { id: 'pdf-push-pushdown', name: 'Rope Pushdown', sets: 3, reps: '12–15', defaultWeightLbs: 30, defaultWeightKg: 14 },
+        { id: 'pdf-push-dips', name: 'Chest Dips', sets: 2, reps: 'Near failure', notes: 'Lean forward for chest focus.', defaultWeightLbs: 0, defaultWeightKg: 0 },
+        { id: 'pdf-push-knee-raise', name: 'Hanging Knee Raises', sets: 3, reps: '12', defaultWeightLbs: 0, defaultWeightKg: 0 },
+      ],
+    },
+    {
+      id: 'pdf-pull',
+      label: 'Pull',
+      goal: 'Back width & thickness, arm size',
+      exercises: [
+        { id: 'pdf-pull-pullups', name: 'Pull-Ups / Lat Pulldown', sets: 4, reps: '8–10', notes: 'Full ROM, dead hang at bottom.', defaultWeightLbs: 70, defaultWeightKg: 32 },
+        { id: 'pdf-pull-facepulls', name: 'Face Pulls', sets: 4, reps: '12–15', notes: 'External rotation at top.', defaultWeightLbs: 25, defaultWeightKg: 11 },
+        { id: 'pdf-pull-row', name: 'Barbell Row', sets: 4, reps: '8–10', notes: 'Pull to lower chest.', defaultWeightLbs: 95, defaultWeightKg: 43 },
+        { id: 'pdf-pull-ezcurl', name: 'EZ Bar Curl', sets: 3, reps: '10', defaultWeightLbs: 55, defaultWeightKg: 25 },
+        { id: 'pdf-pull-incline-curl', name: 'Incline Dumbbell Curl', sets: 2, reps: '12', defaultWeightLbs: 20, defaultWeightKg: 9 },
+        { id: 'pdf-pull-cable-crunch', name: 'Cable Crunches', sets: 3, reps: '15', defaultWeightLbs: 25, defaultWeightKg: 11 },
+      ],
+    },
+    {
+      id: 'pdf-legs',
+      label: 'Legs',
+      goal: 'Overall mass + hormonal stimulus',
+      exercises: [
+        { id: 'pdf-legs-squat', name: 'Barbell Squat', sets: 4, reps: '6–8', notes: 'RPE 8–9 on last set.', defaultWeightLbs: 135, defaultWeightKg: 60 },
+        { id: 'pdf-legs-rdl', name: 'Romanian Deadlift', sets: 3, reps: '8–10', notes: 'Hinge at hips, slight knee bend.', defaultWeightLbs: 115, defaultWeightKg: 52 },
+        { id: 'pdf-legs-press', name: 'Leg Press', sets: 3, reps: '10–12', defaultWeightLbs: 180, defaultWeightKg: 82 },
+        { id: 'pdf-legs-calf', name: 'Standing Calf Raise', sets: 3, reps: '15–20', notes: 'Full range of motion.', defaultWeightLbs: 90, defaultWeightKg: 41 },
+        { id: 'pdf-legs-ab-wheel', name: 'Ab Wheel Rollout', sets: 3, reps: '8–12', defaultWeightLbs: 0, defaultWeightKg: 0 },
+      ],
+    },
+    {
+      id: 'pdf-upper',
+      label: 'Upper',
+      goal: 'Extra volume for fastest visual gains',
+      exercises: [
+        { id: 'pdf-upper-incline-bench', name: 'Incline Barbell Bench Press', sets: 4, reps: '6–8', notes: 'RPE 8–9 on last set.', defaultWeightLbs: 115, defaultWeightKg: 52 },
+        { id: 'pdf-upper-lat-pulldown', name: 'Lat Pulldown', sets: 4, reps: '10', notes: 'Wide or neutral grip.', defaultWeightLbs: 70, defaultWeightKg: 32 },
+        { id: 'pdf-upper-cs-row', name: 'Chest Supported Row', sets: 3, reps: '10', defaultWeightLbs: 35, defaultWeightKg: 16 },
+        { id: 'pdf-upper-cable-fly', name: 'Cable Fly', sets: 3, reps: '12–15', notes: 'Mid or low cable.', defaultWeightLbs: 20, defaultWeightKg: 9 },
+        { id: 'pdf-upper-lateral', name: 'Dumbbell Lateral Raise', sets: 3, reps: '15–20', defaultWeightLbs: 15, defaultWeightKg: 7 },
+      ],
+    },
+    {
+      id: 'pdf-arms',
+      label: 'Arms + Delts',
+      goal: 'Arm size, round delts',
+      exercises: [
+        { id: 'pdf-arms-ohp', name: 'Overhead Press', sets: 4, reps: '6–8', defaultWeightLbs: 95, defaultWeightKg: 43 },
+        { id: 'pdf-arms-ezcurl', name: 'EZ Bar Curl', sets: 4, reps: '10', defaultWeightLbs: 55, defaultWeightKg: 25 },
+        { id: 'pdf-arms-skull', name: 'Skull Crushers', sets: 3, reps: '10', defaultWeightLbs: 55, defaultWeightKg: 25 },
+        { id: 'pdf-arms-hammer', name: 'Hammer Curl', sets: 3, reps: '12', defaultWeightLbs: 25, defaultWeightKg: 11 },
+        { id: 'pdf-arms-pushdown', name: 'Rope Pushdown', sets: 3, reps: '15', defaultWeightLbs: 30, defaultWeightKg: 14 },
+        { id: 'pdf-arms-rear-delt', name: 'Rear Delt Fly', sets: 3, reps: '15', notes: 'Machine or cable.', defaultWeightLbs: 15, defaultWeightKg: 7 },
+        { id: 'pdf-arms-leg-raise', name: 'Hanging Leg Raise', sets: 3, reps: '10–12', defaultWeightLbs: 0, defaultWeightKg: 0 },
+      ],
+    },
+  ],
+};
+
 // Keep old PPL plan for backwards compatibility
 workoutPlans['ppl'] = {
   id: 'ppl',

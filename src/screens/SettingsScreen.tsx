@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useWorkout, useDispatch, getEffectivePlan, getTodayDayIndexFromPlan } from '../context/WorkoutContext';
 import { useAuth } from '../context/AuthContext';
 import { exportStorageJson, importStorageJson } from '../services/storage';
@@ -13,6 +13,9 @@ export default function SettingsScreen() {
   const dispatch = useDispatch();
   const { user, isGuest, signOut, showAuthScreen } = useAuth();
   const [showPlanEditor, setShowPlanEditor] = useState(false);
+  const [editingName, setEditingName] = useState(false);
+  const [nameInput, setNameInput] = useState('');
+  const nameInputRef = useRef<HTMLInputElement>(null);
 
   const { confirm } = useConfirm();
   const { showToast } = useToast();
@@ -129,7 +132,41 @@ export default function SettingsScreen() {
               {showPlanEditor ? 'Hide editor' : 'Edit plan'}
             </button>
           </div>
-          <p className="text-white text-sm font-medium">{plan.name}</p>
+          {editingName ? (
+            <div className="flex items-center gap-2 mt-0.5">
+              <input
+                ref={nameInputRef}
+                autoFocus
+                type="text"
+                value={nameInput}
+                onChange={e => setNameInput(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') { const t = nameInput.trim(); if (t) dispatch({ type: 'RENAME_PLAN', name: t }); setEditingName(false); }
+                  if (e.key === 'Escape') setEditingName(false);
+                }}
+                className="flex-1 bg-gray-800 text-white text-sm font-medium px-2 py-0.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-orange-500"
+              />
+              <button
+                onClick={() => { const t = nameInput.trim(); if (t) dispatch({ type: 'RENAME_PLAN', name: t }); setEditingName(false); }}
+                className="text-orange-400 text-xs font-medium"
+              >✓</button>
+              <button onClick={() => setEditingName(false)} className="text-gray-500 text-xs">✕</button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5">
+              <p className="text-white text-sm font-medium">{plan.name}</p>
+              <button
+                onClick={() => { setNameInput(plan.name); setEditingName(true); }}
+                className="text-gray-600 hover:text-orange-400 transition-colors flex-shrink-0"
+                aria-label="Rename plan"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-3 h-3">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+              </button>
+            </div>
+          )}
           {dayIndex >= 0 ? (
             <p className="text-xs text-gray-500 mt-1">
               Today: <span className="text-orange-400">{plan.days[dayIndex].label}</span>
@@ -160,7 +197,7 @@ export default function SettingsScreen() {
                         : 'bg-gray-800 text-gray-400 hover:text-orange-300 hover:border-orange-500/40 border border-gray-700'
                     }`}
                   >
-                    {t.name}
+                    {profile.settings.planNames?.[t.plan.id] ?? t.name}
                   </button>
                 );
               })}

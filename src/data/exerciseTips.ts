@@ -1789,6 +1789,427 @@ export const exerciseTips: Record<string, ExerciseTip> = {
     ],
   },
 
+  // ── PDF LEAN BULK ───────────────────────────────────────────────────────────
+  // PUSH
+  'pdf-push-bench': {
+    muscles: 'Pectorals, anterior deltoid, triceps',
+    cues: [
+      'Plant your feet firmly on the floor or on a step',
+      'Slight arch in lower back — shoulder blades pinched & depressed',
+      'Bar path: from lower chest up and slightly back toward your face',
+      'Elbows at ~75° to your torso (not flared to 90°)',
+      'Grip just outside shoulder width; wrists straight over elbows',
+    ],
+    mistakes: [
+      'Bouncing the bar off the chest — control the descent (2–3 sec)',
+      'Flared elbows — puts excessive stress on the shoulder joint',
+      'Lifting your hips off the bench mid-set',
+      'Gripping too wide or too narrow — both limit strength & safety',
+    ],
+  },
+  'pdf-push-lateral': {
+    muscles: 'Medial deltoid',
+    cues: [
+      'Slight forward lean at hip (10–15°) to better target medial delt',
+      'Lead with your elbows, not your hands',
+      'Pinky slightly higher than thumb at the top (like pouring water)',
+      'Stop at shoulder height — going higher recruits traps',
+      'Control the descent — 2–3 seconds down',
+    ],
+    mistakes: [
+      'Swinging the weight — use momentum only as a last resort on final reps',
+      'Going too heavy — medial delt is a small muscle; 15 lbs is often enough',
+      'Letting arms drop straight down — maintain tension throughout',
+    ],
+  },
+  'pdf-push-incline': {
+    muscles: 'Upper pectorals, anterior deltoid, triceps',
+    cues: [
+      'Set bench to 30–45° — higher angles shift emphasis to shoulders',
+      'Dumbbells start at shoulder level, neutral or pronated grip',
+      'Press up and slightly inward so dumbbells nearly touch at top',
+      'Keep shoulder blades retracted throughout',
+    ],
+    mistakes: [
+      'Too steep an incline (>45°) turns it into a shoulder press',
+      'Letting the dumbbells drift too far out at the bottom — shoulder strain',
+      'Rushing the concentric — feel the stretch at the bottom',
+    ],
+  },
+  'pdf-push-pushdown': {
+    muscles: 'Triceps (all three heads)',
+    cues: [
+      'Keep your elbows pinned at your sides throughout',
+      'Slight forward lean from the hip',
+      'Full extension at the bottom — squeeze for 1 sec',
+      'Control the return; feel the stretch at the top',
+    ],
+    mistakes: [
+      'Elbows flaring out — elbows must stay fixed at your sides',
+      'Using body momentum — engage only the triceps',
+      'Not reaching full extension at the bottom',
+    ],
+  },
+  'pdf-push-dips': {
+    muscles: 'Lower pectorals, anterior deltoid, triceps',
+    cues: [
+      'Lean slightly forward (10–20°) to shift emphasis to chest',
+      'Lower until upper arms are parallel to the floor (or just below)',
+      'Flare elbows slightly outward for chest focus',
+      'Press back up and slightly forward',
+    ],
+    mistakes: [
+      'Staying too upright — makes it a tricep dip, not chest',
+      'Not going deep enough — partial ROM limits chest stretch',
+      'Shrugging your shoulders upward at the top',
+    ],
+  },
+  'pdf-push-knee-raise': {
+    muscles: 'Rectus abdominis, hip flexors',
+    cues: [
+      'Dead hang from the bar — full shoulder extension before you start',
+      'Tuck your pelvis and curl your hips up as knees rise',
+      'Raise knees to at least hip height (higher = more abs, less hip flexor)',
+      'Lower slowly — 2–3 sec eccentric — do not just let legs drop',
+    ],
+    mistakes: [
+      'Swinging with momentum — stop swinging before each rep',
+      'Only raising to 45° — aim for parallel or above',
+      'No pelvic tilt — pure hip flexion misses the abs',
+    ],
+  },
+
+  // PULL
+  'pdf-pull-pullups': {
+    muscles: 'Latissimus dorsi, biceps, rear deltoid, mid traps',
+    cues: [
+      'Start from a dead hang — full shoulder extension',
+      'Initiate by depressing your shoulder blades before pulling',
+      'Drive your elbows down and back, not just pulling with arms',
+      'Chin clears the bar at the top (pull-ups) or touch bar to chest (pulldown)',
+    ],
+    mistakes: [
+      'Not starting from a full hang — half ROM means half gains',
+      'Kipping or swinging — use strict form for maximum muscle activation',
+      'Pulling with biceps only — think "elbows to hips"',
+    ],
+  },
+  'pdf-pull-facepulls': {
+    muscles: 'Rear deltoid, external rotators, mid & lower traps',
+    cues: [
+      'Set cable at face height or slightly above',
+      'Pull toward your face; elbows flare out to 90°',
+      'At the end, externally rotate — think "double bicep pose"',
+      'Pause at peak contraction for 1–2 sec',
+    ],
+    mistakes: [
+      'Going too heavy — this is a corrective/health exercise; lighter & controlled wins',
+      'No external rotation at the end — that\'s the entire point of the movement',
+      'Letting elbows drop — keep them high and wide throughout',
+    ],
+  },
+  'pdf-pull-row': {
+    muscles: 'Latissimus dorsi, mid trapezius, rhomboids, rear deltoid, biceps',
+    cues: [
+      'Hinge at hip to ~45°, back flat and neutral',
+      'Pull the bar to your lower chest / upper abdomen',
+      'Squeeze shoulder blades at the top — hold 1 sec',
+      'Let the weight stretch at the bottom (don\'t let shoulder round forward)',
+    ],
+    mistakes: [
+      'Rounding the lower back — this is a spine injury waiting to happen',
+      'Pulling to the belly button instead of lower chest — shortens ROM',
+      'Using momentum — slow down, especially on the way down',
+    ],
+  },
+  'pdf-pull-ezcurl': {
+    muscles: 'Biceps brachii, brachialis',
+    cues: [
+      'EZ bar reduces wrist strain vs straight bar',
+      'Full extension at bottom; full peak contraction at top',
+      'Keep elbows fixed at your sides',
+      'Supinate slightly at the top for full bicep contraction',
+    ],
+    mistakes: [
+      'Letting elbows drift forward as you curl — reduces bicep activation',
+      'Partial reps — each rep should be full ROM',
+      'Swinging — use a wall if needed to keep strict',
+    ],
+  },
+  'pdf-pull-incline-curl': {
+    muscles: 'Biceps brachii long head (outer), brachialis',
+    cues: [
+      'Set bench to ~45–60° — the incline creates a larger stretch',
+      'Let arms hang straight down at the start',
+      'Curl all the way up; supinate at the top',
+      'This movement isolates more than standing — keep it strict',
+    ],
+    mistakes: [
+      'Bench too upright — defeats the purpose of the stretch',
+      'Rushing — the eccentric (lowering) phase is where most growth happens',
+    ],
+  },
+  'pdf-pull-cable-crunch': {
+    muscles: 'Rectus abdominis (upper and lower)',
+    cues: [
+      'Kneel below the cable pulley; hold the rope at the sides of your head',
+      'Flex at the spine — bring chest toward hips, not just bowing from the hip',
+      'Pause at the bottom with a hard ab contraction',
+      'Return slowly to get a full stretch at the top',
+    ],
+    mistakes: [
+      'Hip hinging instead of spinal flexion — the movement comes from the abs',
+      'Pulling with arms — hands stay fixed at your head',
+      'Going too heavy and losing spinal flexion',
+    ],
+  },
+
+  // LEGS
+  'pdf-legs-squat': {
+    muscles: 'Quads, glutes, hamstrings, spinal erectors',
+    cues: [
+      'Feet shoulder-width, toes angled out 15–30°',
+      'Brace your core as if about to take a punch',
+      'Break at the hips AND knees simultaneously',
+      'Knees track over your toes throughout',
+      'Depth: at least parallel (hip crease below knee)',
+      'Drive up through the whole foot — don\'t just push with heels',
+    ],
+    mistakes: [
+      'Butt wink (posterior pelvic tilt at depth) — work on hip mobility',
+      'Knees caving in (valgus) — push knees out actively',
+      'Forward lean collapse — chest up, brace harder',
+      'Half reps — go to at least parallel for full quad/glute activation',
+    ],
+  },
+  'pdf-legs-rdl': {
+    muscles: 'Hamstrings, glutes, spinal erectors',
+    cues: [
+      'Soft bend in knees throughout — this is a hip hinge, not a squat',
+      'Push your hips BACK (not down) as the bar descends',
+      'Bar stays close to your body — almost drags along your legs',
+      'Feel a stretch in your hamstrings mid-shin to floor level',
+      'Drive hips forward to stand — squeeze glutes at top',
+    ],
+    mistakes: [
+      'Bending the knees too much — turns it into a stiff-leg deadlift lite',
+      'Rounding the lower back — brace hard, don\'t go lower than your mobility allows',
+      'Bar drifting away from body — keep it close',
+    ],
+  },
+  'pdf-legs-press': {
+    muscles: 'Quads, glutes, hamstrings (foot placement dependent)',
+    cues: [
+      'Feet shoulder-width on the plate; adjust height for your goals',
+      'Lower until thighs are ~90° or slightly past',
+      'Don\'t lock out knees at top — maintain slight tension',
+      'Full foot contact on the platform; don\'t let heels rise',
+    ],
+    mistakes: [
+      'Letting hips come off the pad at the bottom — lower back injury risk',
+      'Feet too low on plate — puts stress on the knees',
+      'Locking out explosively — keep joints safe with a slight bend at top',
+    ],
+  },
+  'pdf-legs-calf': {
+    muscles: 'Gastrocnemius, soleus',
+    cues: [
+      'Full range: deep stretch at the bottom, full plantar flexion at top',
+      'Pause 1–2 sec at the top — calves are best trained with slow tempo',
+      'Don\'t bounce at the bottom — Achilles injury risk',
+      'Both a bent-knee (seated) and straight-knee (standing) variation for full development',
+    ],
+    mistakes: [
+      'Partial reps — calves are stubborn; full ROM is non-negotiable',
+      'Bouncing from the bottom — use the stretch, don\'t abuse it',
+      'Too fast — calves need time under tension',
+    ],
+  },
+  'pdf-legs-ab-wheel': {
+    muscles: 'Rectus abdominis, transverse abdominis, lats',
+    cues: [
+      'Start on knees; roll out only as far as your lower back stays flat',
+      'Pull back using your abs — not just pulling with your arms',
+      'Exhale as you roll back in; brace on the way out',
+      'Start with a short range and gradually extend over weeks',
+    ],
+    mistakes: [
+      'Rolling too far out before you have the core strength — back will arch',
+      'Hips shooting up on the return',
+      'Fast reps — slow and controlled is where the gains are',
+    ],
+  },
+
+  // UPPER
+  'pdf-upper-incline-bench': {
+    muscles: 'Upper pectorals, anterior deltoid, triceps',
+    cues: [
+      'Set bench to 30–45° for maximum upper chest emphasis',
+      'Bar should touch just below your collar bone at the bottom',
+      'Drive bar up and slightly back toward the rack',
+      'Keep shoulder blades retracted and pinned to the bench',
+    ],
+    mistakes: [
+      'Too steep angle (>45°) — becomes a shoulder press',
+      'Bar touching too low on the chest — shifts to flat press territory',
+      'Bouncing the bar — control the descent',
+    ],
+  },
+  'pdf-upper-lat-pulldown': {
+    muscles: 'Latissimus dorsi, biceps, rear deltoid',
+    cues: [
+      'Lean back slightly (5–10°) to create a straight line of pull',
+      'Drive your elbows down toward your hips',
+      'Touch bar to upper chest at the bottom',
+      'Full arm extension at the top — feel the lats stretch',
+    ],
+    mistakes: [
+      'Pulling behind the neck — significant cervical spine risk',
+      'Pulling with arms only instead of thinking "elbows down"',
+      'Not reaching full extension at the top',
+    ],
+  },
+  'pdf-upper-cs-row': {
+    muscles: 'Mid-back, lats, rear deltoid, rhomboids',
+    cues: [
+      'Chest firm against pad — eliminates lower back compensation',
+      'Pull elbows back and up; squeeze shoulder blades hard at top',
+      'Full stretch at the bottom — let arms hang straight',
+      'Great exercise for pure back isolation',
+    ],
+    mistakes: [
+      'Chest lifting off the pad — negates the whole point of the exercise',
+      'Not achieving full ROM at the bottom — you lose the stretch',
+    ],
+  },
+  'pdf-upper-cable-fly': {
+    muscles: 'Pectorals (inner, mid, or lower depending on cable height)',
+    cues: [
+      'Slight bend in elbows throughout — don\'t lock them straight',
+      'Think "hugging a tree" — arc the arms in, not just pulling down',
+      'Squeeze pecs hard at the center — hold 1 sec',
+      'Slow eccentric back out to full stretch',
+    ],
+    mistakes: [
+      'Bending elbows too much — turns it into a press',
+      'Going too heavy — you lose the arc motion',
+      'Not stretching fully at the end — the pec stretch is the growth signal',
+    ],
+  },
+  'pdf-upper-lateral': {
+    muscles: 'Medial deltoid',
+    cues: [
+      'Slight forward lean at hip (10–15°) for better medial delt targeting',
+      'Lead with your elbows, not your hands',
+      'Stop at shoulder height — going higher recruits traps',
+      'On the last set, do partial reps from the bottom for extra burn',
+    ],
+    mistakes: [
+      'Swinging for regular reps — save momentum for deliberate intensity techniques',
+      'Elbows below wrists — keeps the focus off medial delt',
+      'Too heavy — lighter and controlled is more effective',
+    ],
+  },
+
+  // ARMS + DELTS
+  'pdf-arms-ohp': {
+    muscles: 'Anterior & medial deltoid, upper traps, triceps',
+    cues: [
+      'Feet shoulder-width, brace your core like a plank',
+      'Bar at upper chest, elbows slightly in front of the bar',
+      'Press straight up; at lockout the bar is directly over your heels',
+      'Slight backward lean is fine; excessive arch is dangerous',
+      'Engage your glutes and abs throughout — it\'s a full-body brace',
+    ],
+    mistakes: [
+      'Excessive lower back arch — compresses lumbar spine; brace harder',
+      'Pressing the bar forward rather than straight up',
+      'Not locking out fully at the top — you miss the top portion of the lift',
+    ],
+  },
+  'pdf-arms-ezcurl': {
+    muscles: 'Biceps brachii, brachialis',
+    cues: [
+      'EZ bar reduces wrist strain vs straight bar',
+      'Full extension at bottom; full peak contraction at top',
+      'Keep elbows fixed at your sides throughout',
+      'Supinate slightly at the top for full contraction',
+    ],
+    mistakes: [
+      'Letting elbows drift forward as you curl — reduces bicep activation',
+      'Partial reps — full ROM every rep',
+      'Swinging the torso — keep it strict',
+    ],
+  },
+  'pdf-arms-skull': {
+    muscles: 'Triceps (long head primarily)',
+    cues: [
+      'Lower bar toward your forehead or just above (3–5 cm)',
+      'Elbows stay pointed at the ceiling — don\'t let them flare',
+      'Full extension at the top; slight shoulder angle for long head stretch',
+      'Superset with curls — the pump will be intense',
+    ],
+    mistakes: [
+      'Elbows flaring — shifts load to shoulders and elbow joint',
+      'Going too heavy — this exercise taxes the elbow joint; prioritize form',
+    ],
+  },
+  'pdf-arms-hammer': {
+    muscles: 'Brachialis, brachioradialis, biceps',
+    cues: [
+      'Neutral grip (thumbs up) throughout — do NOT supinate',
+      'Great for building arm thickness and forearm strength',
+      'Full extension at bottom; curl until forearm is vertical',
+      'Control the descent — 2–3 sec eccentric',
+    ],
+    mistakes: [
+      'Supinating the wrist — that\'s just a regular curl; keep it neutral',
+      'Going too heavy with poor form',
+      'Swinging — keep the torso still',
+    ],
+  },
+  'pdf-arms-pushdown': {
+    muscles: 'Triceps (all three heads)',
+    cues: [
+      'Keep your elbows pinned at your sides throughout',
+      'Slight forward lean from the hip',
+      'Full extension at the bottom — squeeze for 1 sec',
+      'Control the return; feel the stretch at the top',
+    ],
+    mistakes: [
+      'Elbows flaring out — elbows must stay fixed at your sides',
+      'Using body momentum — engage only the triceps',
+      'Not reaching full extension at the bottom',
+    ],
+  },
+  'pdf-arms-rear-delt': {
+    muscles: 'Rear deltoid, rhomboids, lower traps',
+    cues: [
+      'Hinge forward 45° (or use a reverse pec-deck machine)',
+      'Arms slightly bent; lead with elbows back and out',
+      'Squeeze shoulder blades at the top — hold 1 sec',
+      'Go lighter than you think — rear delt is small',
+    ],
+    mistakes: [
+      'Too much body swing — take the momentum away',
+      'Elbows dropping — keep them at or above shoulder height',
+    ],
+  },
+  'pdf-arms-leg-raise': {
+    muscles: 'Rectus abdominis, hip flexors',
+    cues: [
+      'Dead hang from the bar — full shoulder extension before you start',
+      'Tuck your pelvis and curl your hips up as legs rise',
+      'Raise legs until parallel to the floor (or higher for more abs)',
+      'Lower slowly — 3 sec eccentric — do not just let legs drop',
+    ],
+    mistakes: [
+      'Swinging with momentum — stop swinging before each rep',
+      'Only raising to 45° — aim for parallel or above',
+      'No pelvic tilt — pure hip flexion misses the abs',
+    ],
+  },
+
   // PPL fallbacks
   'bench-press': {
     muscles: 'Pectorals, anterior deltoid, triceps',

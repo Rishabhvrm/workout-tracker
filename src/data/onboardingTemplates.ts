@@ -207,4 +207,11 @@ export const onboardingTemplates: OnboardingTemplate[] = [
     daysPerWeek: 3,
     plan: homePlan,
   },
+  {
+    id: 'pdf-lean-bulk-5day',
+    name: 'My Lean Bulk',
+    description: 'Your 5-day lean bulk — Push / Pull / Legs / Upper / Arms+Delts. 45-min sessions, Mon–Fri.',
+    daysPerWeek: 5,
+    plan: workoutPlans['pdf-lean-bulk-5day'],
+  },
 ];
