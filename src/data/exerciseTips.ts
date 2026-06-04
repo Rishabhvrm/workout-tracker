@@ -2226,4 +2226,318 @@ export const exerciseTips: Record<string, ExerciseTip> = {
     cues: ['Brace core', 'Knees track toes', 'Break parallel', 'Drive through whole foot'],
     mistakes: ['Knee cave', 'Butt wink', 'Chest dropping'],
   },
+
+  // LEAN CUT 4-DAY PLAN
+  'lc-incline-press': {
+    muscles: 'Upper pectorals, anterior deltoid, triceps',
+    cues: [
+      'Set bench to 30–45° — higher angle shifts emphasis to shoulders',
+      'Retract shoulder blades before unracking; keep them pinched throughout',
+      'Lower bar/DBs to upper chest (nipple line), elbows at ~75°',
+      'Press in a slight arc back toward your face, not straight up',
+      'On a cut: keep weight heavy — this is your muscle-retention signal',
+    ],
+    mistakes: [
+      'Too steep an angle (>45°) — becomes a shoulder press, not chest',
+      'Flaring elbows to 90° — shoulder impingement risk',
+      'Letting shoulder blades wing out at the top',
+      'Dropping weight because you\'re in a cut — don\'t; RPE 7–9 still applies',
+    ],
+  },
+  'lc-flat-press': {
+    muscles: 'Pectorals, anterior deltoid, triceps',
+    cues: [
+      'Flat bench: feet planted, slight arch, shoulder blades down and back',
+      'DBs at lower chest level, elbows at ~75° to torso',
+      'Press to full extension without locking elbows out hard',
+      'Control the descent (2–3 sec) — eccentric builds as much muscle as the press',
+    ],
+    mistakes: [
+      'Bouncing DBs off the chest',
+      'Losing shoulder blade retraction mid-set',
+      'Letting DBs drift too wide — strains the shoulder capsule',
+    ],
+  },
+  'lc-ohp-a': {
+    muscles: 'Anterior & medial deltoids, triceps, upper traps, core',
+    cues: [
+      'Grip just outside shoulder width; elbows slightly in front of the bar',
+      'Brace your core and squeeze your glutes before each rep',
+      'Bar travels in a straight line — tuck your chin on the way up, then push your head through',
+      'At the top: shrug slightly to seat the shoulder blade (full elevation)',
+      'Lower under control — don\'t let the bar crash down',
+    ],
+    mistakes: [
+      'Excessive lower-back arch — you\'re pressing with your spine, not shoulders',
+      'Bar path drifting forward — should go straight up over mid-foot',
+      'Cutting range of motion short at the top',
+      'Dropping elbows below bar level on the way down',
+    ],
+  },
+  'lc-lateral-a': {
+    muscles: 'Medial (side) deltoid',
+    cues: [
+      'Slight forward lean (~10°) and slight elbow bend (~15°)',
+      'Lead with your elbow, not your hand — imagine pouring a jug of water',
+      'Stop at shoulder height; pause briefly at the top',
+      'Lower slowly (2–3 sec) — the eccentric is where gains happen',
+      'Keep the tension — don\'t let your arm swing back to your side',
+    ],
+    mistakes: [
+      'Swinging/using momentum — turns it into a trap shrug',
+      'Going above shoulder height — shoulder impingement territory',
+      'Too heavy a weight — you lose control and target muscles',
+      'Shrugging your neck/traps on the way up',
+    ],
+  },
+  'lc-tri-pushdown': {
+    muscles: 'Triceps (all 3 heads, emphasis on lateral head)',
+    cues: [
+      'Pin elbows at your sides throughout — they are the fixed pivot point',
+      'Push straight down to full extension, then squeeze hard at the bottom',
+      'Don\'t let elbows drift forward on the return — keep them locked in',
+      'Control the return up to 90° (don\'t let cable yank your elbows up)',
+    ],
+    mistakes: [
+      'Elbows lifting off your sides as you push — becomes a lat pulldown',
+      'Leaning forward excessively to muscle the weight down',
+      'No lockout — you miss the peak contraction',
+      'Going too heavy and losing elbow position',
+    ],
+  },
+  'lc-squat': {
+    muscles: 'Quads, glutes, hamstrings, adductors, core',
+    cues: [
+      'Brace your core like you\'re about to take a punch before each rep',
+      'Stance shoulder-width or slightly wider; toes out ~30°',
+      'Knees track in line with toes throughout the movement',
+      'Break at hips and knees simultaneously; aim for depth below parallel',
+      'Drive through your whole foot — heel, big toe, and pinky toe contact',
+    ],
+    mistakes: [
+      'Knee cave (valgus collapse) — cue: push knees out over little toes',
+      'Butt wink (lumbar flexion at the bottom) — reduce depth or fix hip mobility',
+      'Chest dropping forward — maintain an upright torso',
+      'Rising onto toes — ankle mobility issue; use heel elevation if needed',
+    ],
+  },
+  'lc-rdl': {
+    muscles: 'Hamstrings, glutes, spinal erectors',
+    cues: [
+      'Start standing tall, bar at hip crease',
+      'Push hips back (not down) — slight knee bend, never a squat',
+      'Bar stays in contact with your legs the entire way down',
+      'Lower until you feel a deep hamstring stretch (typically mid-shin)',
+      'Drive hips forward to stand — squeeze glutes hard at the top',
+    ],
+    mistakes: [
+      'Rounding the lower back — brace hard and hinge, don\'t bend over',
+      'Squatting the weight down instead of hinging',
+      'Bar drifting away from your legs — keeps shear on the spine',
+      'Going too low and losing neutral spine',
+    ],
+  },
+  'lc-split-squat': {
+    muscles: 'Quads, glutes, hip flexors (rear leg), adductors',
+    cues: [
+      'Long stance: front shin roughly vertical at the bottom',
+      'Lower your back knee straight down toward the floor',
+      'Keep your torso upright — don\'t lean into the front leg',
+      'Drive through your front heel to stand',
+      'Keep most weight on the front leg — it\'s the working leg',
+    ],
+    mistakes: [
+      'Short stance — front knee shoots past toes and loads knees excessively',
+      'Leaning forward — puts load on hip flexors, not quads/glutes',
+      'Letting back knee slam the floor — control the descent',
+      'Uneven hip rotation — keep hips square throughout',
+    ],
+  },
+  'lc-calf': {
+    muscles: 'Gastrocnemius (upper calf), soleus (lower calf)',
+    cues: [
+      'Full range of motion: deep stretch at the bottom, full rise at the top',
+      'Pause 1 sec at the top — squeeze before coming down',
+      'Lower slowly (3 sec) — calves respond well to time under tension',
+      'Straight knee targets gastrocnemius; bent knee targets soleus',
+    ],
+    mistakes: [
+      'Partial reps — calves are stubborn; they need full ROM to grow',
+      'Bouncing at the bottom — loses stretch reflex and risks Achilles strain',
+      'Going too fast — momentum removes the muscle from the movement',
+    ],
+  },
+  'lc-knee-raise': {
+    muscles: 'Rectus abdominis (lower), hip flexors, grip',
+    cues: [
+      'Dead hang from the bar — let your body stabilize before starting',
+      'Pull your knees up by contracting your abs, not just your hip flexors',
+      'Tuck your pelvis (posterior tilt) at the top to fully crunch the abs',
+      'Lower your legs slowly — don\'t let them swing down',
+      'Avoid swinging — if you swing, pause and regain control',
+    ],
+    mistakes: [
+      'Using momentum to swing legs up — disengages the abs entirely',
+      'Not tucking the pelvis at the top — misses the abdominal contraction',
+      'Releasing the hang between reps — keep tension on core throughout',
+    ],
+  },
+  'lc-pullup-pulldown': {
+    muscles: 'Latissimus dorsi, biceps, rear deltoid, rhomboids',
+    cues: [
+      'Grip slightly wider than shoulder width; arms fully extended at the start',
+      'Initiate by depressing your shoulder blades (pull them down and back)',
+      'Drive elbows toward your hip pockets — not straight down',
+      'Chin clears the bar (pull-up) or bar touches upper chest (pulldown)',
+      'Control the return to full extension — don\'t let the weight crash',
+    ],
+    mistakes: [
+      'Shrugging shoulders up at the start instead of depressing them',
+      'Pulling with biceps only — focus on driving elbows, not hands',
+      'Kipping on strict sets — use momentum only if specifically programming kip',
+      'Half reps — not reaching full extension at the bottom cuts lat stretch',
+    ],
+  },
+  'lc-sa-row': {
+    muscles: 'Latissimus dorsi, rhomboids, rear deltoid, biceps, core (anti-rotation)',
+    cues: [
+      'Brace your free hand on a bench; keep spine neutral and parallel to floor',
+      'Let the DB hang at arm\'s length — full stretch before each rep',
+      'Pull the elbow back toward your hip (not your shoulder)',
+      'Squeeze your shoulder blade toward your spine at the top',
+      'Keep your hips square — don\'t rotate to muscle the weight up',
+    ],
+    mistakes: [
+      'Rotating the torso to use momentum — defeats the anti-rotation purpose',
+      'Pulling toward the shoulder instead of the hip — becomes a rear delt row',
+      'Not achieving full arm extension at the bottom — cuts the lat stretch',
+      'Shrugging the shoulder at the top instead of retracting the blade',
+    ],
+  },
+  'lc-face-pull': {
+    muscles: 'Rear deltoid, external rotators (infraspinatus, teres minor), rhomboids, middle traps',
+    cues: [
+      'Set cable at or above head height; grip rope with thumbs up',
+      'Pull the rope toward your face, separating the ends around your head',
+      'Externally rotate at the top — hands finish beside your ears, elbows high',
+      'Pause 1 sec at the peak, then control the return',
+      'Keep your core braced; don\'t lean back to create momentum',
+    ],
+    mistakes: [
+      'No external rotation at the top — turns it into a rear delt row only',
+      'Elbows dropping below shoulder height — loses rear delt emphasis',
+      'Leaning back with each rep — momentum removes the shoulder work',
+      'Going too heavy — light-to-moderate weight with full ROM beats heavy partials',
+    ],
+  },
+  'lc-ez-curl': {
+    muscles: 'Biceps brachii, brachialis, brachioradialis',
+    cues: [
+      'Grip the EZ-bar on the angled sections — reduces wrist stress vs straight bar',
+      'Pin elbows at your sides; they are the fixed pivot point',
+      'Curl until forearms are vertical (or slightly past) — full contraction',
+      'Lower slowly (2–3 sec) — the eccentric phase builds as much as the curl',
+      'At the bottom, maintain slight elbow bend — don\'t hyperextend',
+    ],
+    mistakes: [
+      'Elbows swinging forward as you curl — turns it into a front raise',
+      'Using body sway/momentum to get the bar up — go lighter',
+      'Not reaching full extension at the bottom — cuts the stretch stimulus',
+      'Rushing the descent — slow it down for maximum hypertrophy',
+    ],
+  },
+  'lc-hammer-curl': {
+    muscles: 'Brachialis, brachioradialis, biceps brachii (long head)',
+    cues: [
+      'Neutral grip (palms facing each other) throughout — don\'t rotate wrists',
+      'Elbows pinned to your sides; curl up until forearms are vertical',
+      'Can be done alternating or together; alternating allows heavier load',
+      'Squeeze at the top, then control the descent',
+    ],
+    mistakes: [
+      'Rotating to a supinated grip at the top — that\'s a regular curl; keep neutral',
+      'Swinging elbows forward — same mistake as any curl variation',
+      'Rushing — hammer curls have a bigger brachialis stimulus with slow eccentrics',
+    ],
+  },
+  'lc-ohp-d': {
+    muscles: 'Anterior & medial deltoids, triceps, upper traps, core',
+    cues: [
+      'Grip just outside shoulder width; elbows slightly in front of the bar',
+      'Brace your core and squeeze your glutes before each rep',
+      'Bar travels in a straight line — tuck your chin on the way up, then push your head through',
+      'At the top: shrug slightly to seat the shoulder blade (full elevation)',
+      'Lower under control — don\'t let the bar crash down',
+    ],
+    mistakes: [
+      'Excessive lower-back arch — you\'re pressing with your spine, not shoulders',
+      'Bar path drifting forward — should go straight up over mid-foot',
+      'Cutting range of motion short at the top',
+      'Dropping elbows below bar level on the way down',
+    ],
+  },
+  'lc-lateral-d': {
+    muscles: 'Medial (side) deltoid',
+    cues: [
+      'Slight forward lean (~10°) and slight elbow bend (~15°)',
+      'Lead with your elbow, not your hand — imagine pouring a jug of water',
+      'Stop at shoulder height; pause briefly at the top',
+      'Lower slowly (2–3 sec) — the eccentric is where gains happen',
+      'Keep the tension — don\'t let your arm swing back to your side',
+    ],
+    mistakes: [
+      'Swinging/using momentum — turns it into a trap shrug',
+      'Going above shoulder height — shoulder impingement territory',
+      'Too heavy a weight — you lose control and target muscles',
+      'Shrugging your neck/traps on the way up',
+    ],
+  },
+  'lc-rear-delt': {
+    muscles: 'Posterior deltoid, rhomboids, middle traps',
+    cues: [
+      'Hinge forward 45–90° or use a rear delt machine; keep spine neutral',
+      'Let arms hang straight down before each rep, elbows soft',
+      'Raise arms out to the sides in a wide arc — lead with elbows, not hands',
+      'At the top, pause and squeeze the back of the shoulder',
+      'Lower slowly — rear delts respond better to controlled eccentrics',
+    ],
+    mistakes: [
+      'Going too heavy and turning it into a trap shrug',
+      'Bending elbows too much — reduces rear delt involvement',
+      'Not hinging enough — an upright torso shifts work to lateral delts',
+      'Rushing the movement — you lose the target muscle quickly with sloppy form',
+    ],
+  },
+  'lc-ez-curl-d': {
+    muscles: 'Biceps brachii, brachialis, brachioradialis',
+    cues: [
+      'Grip the EZ-bar on the angled sections — reduces wrist stress vs straight bar',
+      'Pin elbows at your sides; they are the fixed pivot point',
+      'Curl until forearms are vertical (or slightly past) — full contraction',
+      'Lower slowly (2–3 sec) — the eccentric phase builds as much as the curl',
+      'At the bottom, maintain slight elbow bend — don\'t hyperextend',
+    ],
+    mistakes: [
+      'Elbows swinging forward as you curl — turns it into a front raise',
+      'Using body sway/momentum to get the bar up — go lighter',
+      'Not reaching full extension at the bottom — cuts the stretch stimulus',
+      'Rushing the descent — slow it down for maximum hypertrophy',
+    ],
+  },
+  'lc-cable-tri-ext': {
+    muscles: 'Triceps long head (primary), lateral and medial heads',
+    cues: [
+      'Face away from the cable; set cable high; hold rope overhead with both hands',
+      'Elbows stay tucked beside your head — they are the fixed pivot',
+      'Extend forearms forward and down until arms are fully straight',
+      'Squeeze triceps hard at full extension; don\'t let elbows flare out',
+      'Return slowly — the stretch of the long head at the top is key',
+    ],
+    mistakes: [
+      'Elbows flaring wide — recruits chest and shoulders, takes triceps off',
+      'Not reaching full extension — you miss the peak contraction',
+      'Leaning forward excessively to compensate for too much weight',
+      'Rushing the return — the stretch under load is where long-head growth happens',
+    ],
+  },
 };

@@ -221,6 +221,62 @@ workoutPlans['pdf-lean-bulk-5day'] = {
   ],
 };
 
+workoutPlans['lean-cut-4day'] = {
+  id: 'lean-cut-4day',
+  name: 'Lean Cut — 4-Day Rolling Split',
+  // Rotating cycle: A → B → C → D → A, train whenever (3–4 days/week). No weeklySchedule.
+  days: [
+    {
+      id: 'lc-upper-push',
+      label: 'Upper (Push)',
+      goal: 'Chest thickness, shoulder caps — keep weights HEAVY',
+      exercises: [
+        { id: 'lc-incline-press', name: 'Incline Press (Barbell or DB)', sets: 3, reps: '6–8', notes: 'RPE 7–9. Heaviest lift of the day.', defaultWeightLbs: 95, defaultWeightKg: 43 },
+        { id: 'lc-flat-press', name: 'Flat DB or Machine Press', sets: 3, reps: '8–10', defaultWeightLbs: 30, defaultWeightKg: 14 },
+        { id: 'lc-ohp-a', name: 'Overhead Press', sets: 3, reps: '8–10', defaultWeightLbs: 85, defaultWeightKg: 38 },
+        { id: 'lc-lateral-a', name: 'Lateral Raise', sets: 3, reps: '12–15', notes: 'Controlled, no swinging.', defaultWeightLbs: 15, defaultWeightKg: 7 },
+        { id: 'lc-tri-pushdown', name: 'Triceps Pushdown', sets: 3, reps: '12–15', defaultWeightLbs: 30, defaultWeightKg: 14 },
+      ],
+    },
+    {
+      id: 'lc-lower',
+      label: 'Lower',
+      goal: 'Quads, hamstrings, glutes — stay heavy through the cut',
+      exercises: [
+        { id: 'lc-squat', name: 'Squat or Leg Press', sets: 3, reps: '6–8', notes: 'RPE 7–9. Keep load heavy.', defaultWeightLbs: 135, defaultWeightKg: 60 },
+        { id: 'lc-rdl', name: 'Romanian Deadlift', sets: 3, reps: '8–10', notes: 'Hinge at hips, slight knee bend.', defaultWeightLbs: 115, defaultWeightKg: 52 },
+        { id: 'lc-split-squat', name: 'Split Squat or Leg Press', sets: 2, reps: '10–12', defaultWeightLbs: 25, defaultWeightKg: 11 },
+        { id: 'lc-calf', name: 'Calf Raise', sets: 3, reps: '15', notes: 'Full range of motion.', defaultWeightLbs: 80, defaultWeightKg: 36 },
+        { id: 'lc-knee-raise', name: 'Hanging Knee Raise', sets: 3, reps: '12', defaultWeightLbs: 0, defaultWeightKg: 0 },
+      ],
+    },
+    {
+      id: 'lc-upper-pull',
+      label: 'Upper (Pull)',
+      goal: 'Back width & thickness, biceps',
+      exercises: [
+        { id: 'lc-pullup-pulldown', name: 'Pull-up or Lat Pulldown', sets: 3, reps: '8–10', notes: 'Full ROM, dead hang at bottom.', defaultWeightLbs: 70, defaultWeightKg: 32 },
+        { id: 'lc-sa-row', name: 'Single-Arm Dumbbell Row', sets: 3, reps: '8–10', notes: 'Go heavy — no lower-back strain.', defaultWeightLbs: 50, defaultWeightKg: 22 },
+        { id: 'lc-face-pull', name: 'Face Pull', sets: 3, reps: '15', notes: 'External rotation at top.', defaultWeightLbs: 25, defaultWeightKg: 11 },
+        { id: 'lc-ez-curl', name: 'EZ-Bar or DB Curl', sets: 3, reps: '10–12', defaultWeightLbs: 55, defaultWeightKg: 25 },
+        { id: 'lc-hammer-curl', name: 'Hammer Curl', sets: 2, reps: '12', defaultWeightLbs: 25, defaultWeightKg: 11 },
+      ],
+    },
+    {
+      id: 'lc-shoulders-arms',
+      label: 'Shoulders + Arms',
+      goal: '"Looks good in a shirt" — round delts, arm size',
+      exercises: [
+        { id: 'lc-ohp-d', name: 'Overhead Press', sets: 3, reps: '6–8', notes: 'Heaviest press of this day. RPE 8.', defaultWeightLbs: 85, defaultWeightKg: 38 },
+        { id: 'lc-lateral-d', name: 'Lateral Raise', sets: 3, reps: '15', defaultWeightLbs: 15, defaultWeightKg: 7 },
+        { id: 'lc-rear-delt', name: 'Rear Delt Fly', sets: 3, reps: '15', notes: 'Machine or cable.', defaultWeightLbs: 15, defaultWeightKg: 7 },
+        { id: 'lc-ez-curl-d', name: 'EZ-Bar Curl', sets: 3, reps: '10', defaultWeightLbs: 55, defaultWeightKg: 25 },
+        { id: 'lc-cable-tri-ext', name: 'Cable Overhead Triceps Extension', sets: 3, reps: '12', notes: 'Rope, facing away. Hits long head, easy on elbows. DB overhead ext works too.', defaultWeightLbs: 25, defaultWeightKg: 11 },
+      ],
+    },
+  ],
+};
+
 // Keep old PPL plan for backwards compatibility
 workoutPlans['ppl'] = {
   id: 'ppl',

@@ -19,9 +19,10 @@ export async function fetchProfile(userId: string): Promise<DbProfile | null> {
   return data as DbProfile;
 }
 
-export async function upsertProfile(userId: string, patch: Partial<Omit<DbProfile, 'id'>>): Promise<void> {
+export async function upsertProfile(userId: string, patch: Partial<Omit<DbProfile, 'id'>>): Promise<boolean> {
   const { error } = await supabase.from('profiles').update(patch).eq('id', userId);
-  if (error) console.error('upsertProfile:', error.message);
+  if (error) { console.error('upsertProfile:', error.message); return false; }
+  return true;
 }
 
 export async function fetchSessions(userId: string): Promise<Record<string, WorkoutSession>> {
@@ -45,7 +46,7 @@ export async function fetchSessions(userId: string): Promise<Record<string, Work
   return result;
 }
 
-export async function upsertSession(userId: string, session: WorkoutSession): Promise<void> {
+export async function upsertSession(userId: string, session: WorkoutSession): Promise<boolean> {
   const { error } = await supabase.from('workout_sessions').upsert(
     {
       user_id: userId,
@@ -58,7 +59,8 @@ export async function upsertSession(userId: string, session: WorkoutSession): Pr
     },
     { onConflict: 'user_id,date' }
   );
-  if (error) console.error('upsertSession:', error.message);
+  if (error) { console.error('upsertSession:', error.message); return false; }
+  return true;
 }
 
 export async function fetchCustomPlan(userId: string): Promise<WorkoutPlan | null> {
@@ -71,10 +73,11 @@ export async function fetchCustomPlan(userId: string): Promise<WorkoutPlan | nul
   return (data?.plan_data as WorkoutPlan) ?? null;
 }
 
-export async function upsertCustomPlan(userId: string, plan: WorkoutPlan): Promise<void> {
+export async function upsertCustomPlan(userId: string, plan: WorkoutPlan): Promise<boolean> {
   const { error } = await supabase.from('custom_plans').upsert(
     { user_id: userId, plan_data: plan, updated_at: new Date().toISOString() },
     { onConflict: 'user_id' }
   );
-  if (error) console.error('upsertCustomPlan:', error.message);
+  if (error) { console.error('upsertCustomPlan:', error.message); return false; }
+  return true;
 }

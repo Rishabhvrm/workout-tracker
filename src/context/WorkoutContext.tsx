@@ -6,6 +6,7 @@ import { getTodayISO, getTodayDayOfWeek, getDayIndex } from '../utils/dateUtils'
 import { fetchProfile, fetchSessions, fetchCustomPlan, upsertProfile, upsertSession, upsertCustomPlan } from '../services/database';
 import type { DbProfile } from '../services/database';
 import { useAuth } from './AuthContext';
+import { useToast } from './ToastContext';
 
 type Action =
   | { type: 'START_SESSION'; dayIndexOverride?: number }
@@ -508,7 +509,9 @@ const WorkoutContext = createContext<WorkoutContextValue | null>(null);
 export function WorkoutProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, undefined, readStorage);
   const { user, isGuest, guestChosen } = useAuth();
+  const { showToast } = useToast();
   const syncTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const syncErrorShownRef = useRef(false);
   const [syncReady, setSyncReady] = useState(false);
 
   // Disable localStorage writes in guest mode
@@ -577,15 +580,24 @@ export function WorkoutProvider({ children }: { children: React.ReactNode }) {
     const today = getTodayISO();
     const session = profile.sessions[today];
     const delay = session?.completedAt ? 0 : 1500;
-    syncTimer.current = setTimeout(() => {
-      upsertProfile(user.id, {
-        name: profile.name,
-        weight_unit: profile.settings.weightUnit,
-        rest_timer_seconds: profile.settings.restTimerSeconds,
-        cycle_anchor_date: profile.settings.cycleAnchorDate,
-      }).catch(console.error);
-      if (session) upsertSession(user.id, session).catch(console.error);
-      if (profile.customPlan) upsertCustomPlan(user.id, profile.customPlan).catch(console.error);
+    syncTimer.current = setTimeout(async () => {
+      const results = await Promise.all([
+        upsertProfile(user.id, {
+          name: profile.name,
+          weight_unit: profile.settings.weightUnit,
+          rest_timer_seconds: profile.settings.restTimerSeconds,
+          cycle_anchor_date: profile.settings.cycleAnchorDate,
+        }),
+        session ? upsertSession(user.id, session) : Promise.resolve(true),
+        profile.customPlan ? upsertCustomPlan(user.id, profile.customPlan) : Promise.resolve(true),
+      ]);
+      if (results.some(ok => !ok)) {
+        if (!syncErrorShownRef.current) {
+          showToast('Sync failed — changes saved locally', 'error');
+          syncErrorShownRef.current = true;
+          setTimeout(() => { syncErrorShownRef.current = false; }, 30_000);
+        }
+      }
     }, delay);
     return () => { if (syncTimer.current) clearTimeout(syncTimer.current); };
   }, [state, user?.id, isGuest]);

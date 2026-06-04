@@ -214,4 +214,11 @@ export const onboardingTemplates: OnboardingTemplate[] = [
     daysPerWeek: 5,
     plan: workoutPlans['pdf-lean-bulk-5day'],
   },
+  {
+    id: 'lean-cut-4day',
+    name: 'Lean Cut',
+    description: 'Rolling A→B→C→D cycle — train 3–4 days/week whenever. Heavy weights, short sessions. Cuts fat, keeps muscle.',
+    daysPerWeek: 4,
+    plan: workoutPlans['lean-cut-4day'],
+  },
 ];
