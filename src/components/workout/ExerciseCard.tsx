@@ -34,12 +34,12 @@ export default function ExerciseCard({ exercise, notes, dayId }: Props) {
   const today = getTodayISO();
   let lastExercise: SessionExercise | null = null;
   for (const s of Object.values(profile.sessions).sort((a, b) => b.date.localeCompare(a.date))) {
-    if (s.date >= today) continue;
+    if (s.date === today) continue;
     const found = s.exercises.find(e => e.exerciseId === exercise.exerciseId);
     if (found) { lastExercise = found; break; }
   }
   const prevWeights = Object.values(profile.sessions)
-    .filter(s => s.date < today)
+    .filter(s => s.date !== today)
     .flatMap(s => s.exercises.filter(e => e.exerciseId === exercise.exerciseId))
     .flatMap(e => e.sets.map(s => s.weight ?? 0));
   const allTimeMaxWeight = prevWeights.length > 0 ? Math.max(...prevWeights) : 0;

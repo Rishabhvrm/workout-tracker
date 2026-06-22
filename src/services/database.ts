@@ -20,7 +20,10 @@ export async function fetchProfile(userId: string): Promise<DbProfile | null> {
 }
 
 export async function upsertProfile(userId: string, patch: Partial<Omit<DbProfile, 'id'>>): Promise<boolean> {
-  const { error } = await supabase.from('profiles').update(patch).eq('id', userId);
+  const { error } = await supabase.from('profiles').upsert(
+    { id: userId, ...patch },
+    { onConflict: 'id' }
+  );
   if (error) { console.error('upsertProfile:', error.message); return false; }
   return true;
 }
